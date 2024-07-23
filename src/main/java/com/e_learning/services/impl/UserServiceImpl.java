@@ -122,4 +122,40 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toList());
     }
 
+	 @Override
+	    public void addRoleToUser(String email, String roleName) {
+		// Find the user by email
+		    User user = userRepo.findByEmail(email)
+		            .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+		    // Find the role by name
+		    Role role = roleRepo.findByName(roleName)
+		            .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName));
+
+		    // Clear existing roles
+		    user.getRoles().clear();
+
+		    // Add the new role
+		    user.getRoles().add(role);
+
+		    // Save the user
+		    userRepo.save(user);
+	    }
+	 
+	 @Override
+	    public UserDto getUserByEmail(String email) {
+	        User user = userRepo.findByEmail(email)
+	                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+	        return modelMapper.map(user, UserDto.class);
+	    }
+
+	 @Override
+	    public List<UserDto> getUsersByRole(String roleName) {
+	        Role role = roleRepo.findByName(roleName)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName));
+	        return userRepo.findAll().stream()
+	                .filter(user -> user.getRoles().contains(role))
+	                .map(user -> modelMapper.map(user, UserDto.class))
+	                .collect(Collectors.toList());
+	    }
 }

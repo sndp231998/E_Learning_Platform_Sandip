@@ -31,6 +31,8 @@ public interface PostService {
 		
 		PostDto getPostById(Integer postId);
 		
+		
+		
 		//get all posts by category
 		
 		List<PostDto> getPostsByCategory(Integer categoryId);
@@ -38,10 +40,15 @@ public interface PostService {
 		//get all posts by user
 		List<PostDto> getPostsByUser(Integer userId);
 		
+		//get all post by user faculty
+		
+		List<PostDto>getPostsByUserFaculty(Integer userId);
+		
 		//search posts
 		List<PostDto> searchPosts(String keyword);
 		
-		List<PostDto> getPostsByCategoryTitle(String title);  
+		//List<PostDto> getPostsByCategoryTitle(String categoryTitle, Integer userId);
+		//List<PostDto> getPostsByCategoryTitle(String title);  
 		
 
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.e_learning.payloads.ApiResponse;
@@ -71,6 +72,27 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getUsersByCollegeName(@PathVariable String collegename) {
         List<UserDto> users = userService.getUsersByCollegeName(collegename);
         return ResponseEntity.ok(users);
+    }
+	
+	//ROles ko ------------------
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping("/addRole/email/{email}/role/{roleName}")
+	public ResponseEntity<ApiResponse> addRoleToUser(@PathVariable String email, @PathVariable String roleName) {
+	    	    userService.addRoleToUser(email, roleName);
+	    ApiResponse response = new ApiResponse("Role added successfully", true);
+	    return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@GetMapping("/email/{email}")
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
+        UserDto user = userService.getUserByEmail(email);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+	
+    @GetMapping("/role/{roleName}")
+    public ResponseEntity<List<UserDto>> getUsersByRole(@PathVariable String roleName) {
+        List<UserDto> users = userService.getUsersByRole(roleName);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
 }

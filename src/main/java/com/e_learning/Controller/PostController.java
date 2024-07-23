@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,17 +74,34 @@ public class PostController {
 		return new ResponseEntity<List<PostDto>>(posts, HttpStatus.OK);
 
 	}
-//	get Posts by category title
+//	get Posts By userFaculty
+	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
+	 @GetMapping("posts/user/{userId}")
+	    public ResponseEntity<List<PostDto>> getPostsByUserFaculty(@PathVariable Integer userId) {
+	        List<PostDto> posts = this.postService.getPostsByUserFaculty(userId);
+	        return new ResponseEntity<>(posts, HttpStatus.OK);
+	    }
 	
-	@GetMapping("/category/title/{title}")
-    public ResponseEntity<List<PostDto>> getPostsByCategoryTitle(@PathVariable String title) {
-        List<PostDto> posts = postService.getPostsByCategoryTitle(title);
-        if (posts.isEmpty()) {
-            System.out.println("No posts found for category title: " + title);
-            return ResponseEntity.noContent().build(); // HTTP 204 No Content
-        }
-        return ResponseEntity.ok(posts);
-    }
+////	get Posts by category title
+//	
+//	@GetMapping("/category/title/{title}")
+//    public ResponseEntity<List<PostDto>> getPostsByCategoryTitle(@PathVariable String title) {
+//        List<PostDto> posts = postService.getPostsByCategoryTitle(title);
+//        if (posts.isEmpty()) {
+//            System.out.println("No posts found for category title: " + title);
+//            return ResponseEntity.noContent().build(); // HTTP 204 No Content
+//        }
+//        return ResponseEntity.ok(posts);
+//    }
+
+	
+//	 @GetMapping("/category/{categoryTitle}/user/{userId}")
+//	    public ResponseEntity<List<PostDto>> getPostsByCategoryTitle(
+//	            @PathVariable String categoryTitle,
+//	            @PathVariable Integer userId) {
+//	        List<PostDto> posts = postService.getPostsByCategoryTitle(categoryTitle, userId);
+//	        return ResponseEntity.ok(posts);
+//	    }
 
 	// get all posts
 

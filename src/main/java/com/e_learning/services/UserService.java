@@ -23,5 +23,12 @@ UserDto registerNewUser(UserDto user);
 	
 	List<UserDto> getUsersByCollegeName(String collegename);  
 	
+	//--------------------------------------------
+	void addRoleToUser(String email, String roleName);
+	
+    UserDto getUserByEmail(String email);
+    
+    List<UserDto> getUsersByRole(String roleName);
+	
 
 }
