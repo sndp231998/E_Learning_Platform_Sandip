@@ -10,5 +10,8 @@ import com.e_learning.entities.Category;
 
 public interface CategoryRepo extends JpaRepository<Category, Integer> {
 
+	@Query("SELECT c FROM Category c WHERE c.categoryTitle = :categoryTitle")
+	Category findByCategoryTitle(@Param("categoryTitle") String categoryTitle);
+
 	
 }

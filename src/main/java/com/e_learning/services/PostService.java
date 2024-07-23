@@ -2,8 +2,10 @@ package com.e_learning.services;
 
 import java.util.List;
 
+import com.e_learning.payloads.ApiResponse;
 import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.PostResponse;
+import com.e_learning.payloads.UserDto;
 
 
 
@@ -38,5 +40,8 @@ public interface PostService {
 		
 		//search posts
 		List<PostDto> searchPosts(String keyword);
+		
+		List<PostDto> getPostsByCategoryTitle(String title);  
+		
 
 }

@@ -25,6 +25,8 @@ public class Post {
     private String content;
 
     private String imageName;
+    
+    private String videoLink;
 
     private Date addedDate;
 

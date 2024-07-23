@@ -22,5 +22,6 @@ UserDto registerNewUser(UserDto user);
 	void deleteUser(Integer userId);
 	
 	List<UserDto> getUsersByCollegeName(String collegename);  
+	
 
 }

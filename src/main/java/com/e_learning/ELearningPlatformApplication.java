@@ -39,21 +39,33 @@ public class ELearningPlatformApplication implements CommandLineRunner {
 		System.out.println(this.passwordEncoder.encode("xyz"));
 
 		try {
-			Role role = new Role();
-			role.setId(AppConstants.ADMIN_USER);
-			role.setName("ROLE_ADMIN");
+			
+			  Role role1 = new Role();
+		        role1.setId(AppConstants.NORMAL_USER);
+		        role1.setName("ROLE_NORMAL");
+		        
+	        Role role = new Role();
+	        role.setId(AppConstants.ADMIN_USER);
+	        role.setName("ROLE_ADMIN");
 
-			Role role1 = new Role();
-			role1.setId(AppConstants.NORMAL_USER);
-			role1.setName("ROLE_NORMAL");
+	      
+	        Role role2 = new Role();
+	        role2.setId(AppConstants.SUBSCRIBED_USER);
+	        role2.setName("ROLE_SUBSCRIBED");
 
-			List<Role> roles = List.of(role, role1);
+	        
+	        Role role3=new Role();
+	        role3.setId(AppConstants.TEACHER_USER);
+	        role3.setName("Role_TEACHER");
+	        
+	        
+	        List<Role> roles = List.of(role, role1, role2 , role3);
 
-			List<Role> result = this.roleRepo.saveAll(roles);
+	        List<Role> result = this.roleRepo.saveAll(roles);
 
-			result.forEach(r -> {
-				System.out.println(r.getName());
-			});
+	        result.forEach(r -> {
+	            System.out.println(r.getName());
+	        });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

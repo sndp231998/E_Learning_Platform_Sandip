@@ -2,6 +2,7 @@ package com.e_learning.Controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -72,6 +73,17 @@ public class PostController {
 		return new ResponseEntity<List<PostDto>>(posts, HttpStatus.OK);
 
 	}
+//	get Posts by category title
+	
+	@GetMapping("/category/title/{title}")
+    public ResponseEntity<List<PostDto>> getPostsByCategoryTitle(@PathVariable String title) {
+        List<PostDto> posts = postService.getPostsByCategoryTitle(title);
+        if (posts.isEmpty()) {
+            System.out.println("No posts found for category title: " + title);
+            return ResponseEntity.noContent().build(); // HTTP 204 No Content
+        }
+        return ResponseEntity.ok(posts);
+    }
 
 	// get all posts
 
@@ -149,4 +161,6 @@ public class PostController {
 
     }
 
+    
+    
 }

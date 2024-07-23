@@ -23,6 +23,8 @@ public class PostDto {
 	
 	private String imageName;
 	
+	private String videoLink;
+	
 	private Date addedDate;	
 	
 	private CategoryDto category;

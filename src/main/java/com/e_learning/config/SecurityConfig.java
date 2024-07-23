@@ -91,41 +91,6 @@ public class SecurityConfig {
 
 	    }
 
-		/*
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-
-			http.
-					csrf()
-					.disable()
-					.authorizeHttpRequests()
-					.antMatchers(PUBLIC_URLS)
-					.permitAll()
-					.antMatchers(HttpMethod.GET)
-					.permitAll()
-					.anyRequest()
-					.authenticated()
-					.and().exceptionHandling()
-					.authenticationEntryPoint(this.jwtAuthenticationEntryPoint)
-					.and()
-					.sessionManagement()
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-			http.addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-		}
-
-		 */
-
-	    /*
-	    @Override
-	    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
-	        auth.userDetailsService(this.customUserDetailService).passwordEncoder(passwordEncoder());
-
-	    }
-
-	    */
 
 
 	    @Bean
@@ -133,15 +98,7 @@ public class SecurityConfig {
 	        return new BCryptPasswordEncoder();
 	    }
 
-		/*
-		@Bean
-		@Override
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
-		}
-
-		 */
-
+		
 	    @Bean
 	    public DaoAuthenticationProvider daoAuthenticationProvider() {
 

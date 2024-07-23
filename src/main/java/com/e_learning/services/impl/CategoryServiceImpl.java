@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Category;
+import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.CategoryDto;
+import com.e_learning.payloads.UserDto;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.services.CategoryService;
 
@@ -75,5 +77,19 @@ public class CategoryServiceImpl implements CategoryService {
 
 		return catDtos;
 	}
+
+	
+//	@Override
+//    public List<UserDto> getUsersByCollegeName(String collegename) {
+//        List<User> users = userRepo.findByCollegename(collegename);
+//        return users.stream()
+//                    .map(user -> modelMapper.map(user, UserDto.class))
+//                    .collect(Collectors.toList());
+//    }
+//	@Override
+//	public List<CategoryDto> getUsersByCategoryTitle(String title) {
+//		List<Category>categorys
+//		return null;
+//	}
 
 }

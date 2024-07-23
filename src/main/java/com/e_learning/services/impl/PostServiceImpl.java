@@ -1,5 +1,6 @@
 package com.e_learning.services.impl;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,18 +11,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Category;
 import com.e_learning.entities.Post;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
+import com.e_learning.payloads.ApiResponse;
 import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.PostResponse;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.PostRepo;
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.PostService;
+import com.e_learning.services.UserService;
 
 
 
@@ -39,7 +43,15 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private CategoryRepo categoryRepo;
-
+    
+//    private final User user;  // This should be injected properly
+//
+//    @Autowired
+//    public PostServiceImpl(User user) {
+//        this.user = user;
+//    }
+//        
+        
     @Override
     public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId) {
 
@@ -155,5 +167,38 @@ public class PostServiceImpl implements PostService {
         List<PostDto> postDtos = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
         return postDtos;
     }
-
+    
+   
+//String subscribedClass= user.getFaculty();
+//    
+    @Override
+    public List<PostDto> getPostsByCategoryTitle(String title) {
+        // Fetch the category by title
+        Category category = this.categoryRepo.findByCategoryTitle(title);
+        
+        // Check if category is found
+        if (category == null) {
+            throw new ResourceNotFoundException("Category", "title", title);
+        }
+        
+        // Fetch posts associated with the category
+        List<Post> posts = this.postRepo.findByCategory(category);
+        
+        if(posts.isEmpty()) {
+            System.out.println("No posts found for category: ");
+            // Return an empty list if no posts are found
+            return Collections.emptyList();
+        }
+        // Transform posts to PostDto
+        List<PostDto> postDtos = posts.stream()
+                                      .map(post -> this.modelMapper.map(post, PostDto.class))
+                                      .collect(Collectors.toList());
+        
+        return postDtos;
+    }
 }
+	
+
+	
+	
+	

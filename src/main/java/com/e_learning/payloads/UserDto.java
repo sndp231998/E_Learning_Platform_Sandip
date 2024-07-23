@@ -36,6 +36,8 @@ public class UserDto {
 	@NotEmpty
 	private String collegename;
 	
+	private String faculty;
+	
 	private Set<RoleDto> roles = new HashSet<>();
 	
 	
