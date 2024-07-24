@@ -60,6 +60,7 @@ public class ExamController {
 
 	}
 	
+	//Get Exams BY Category
 	@GetMapping("/category/{categoryId}/exams")
 	public ResponseEntity<List<ExamDto>> getExamsByCategory(@PathVariable Integer categoryId) {
 
@@ -77,7 +78,7 @@ public class ExamController {
 	    }
 	
 	// get all Exam
-		@GetMapping("/")
+		@GetMapping("/exams")
 		public ResponseEntity<List<ExamDto>> getExams() {
 			List<ExamDto> exams = this.examService.getExams();
 			return ResponseEntity.ok(exams);
@@ -119,29 +120,32 @@ public class ExamController {
 		
 		// post image upload
 
-		@PostMapping("/exam/image/upload/{examId}")
-		public ResponseEntity<ExamDto> uploadExamImage(@RequestParam("image") MultipartFile image,
-				@PathVariable Integer examId) throws IOException {
-
-			ExamDto examDto = this.examService.getExamById(examId);
-			
-			String fileName = this.fileService.uploadImage(path, image);
-			examDto.setImageName(fileName);
-			ExamDto updateExam = this.examService.updateExam(examDto, examId);
-			return new ResponseEntity<ExamDto>(updateExam, HttpStatus.OK);
-
-		}
-		
-		 //method to serve files
-	    @GetMapping(value = "/exam/image/{imageName}",produces = MediaType.IMAGE_JPEG_VALUE)
-	    public void downloadImage(
-	            @PathVariable("imageName") String imageName,
-	            HttpServletResponse response
-	    ) throws IOException {
-
-	        InputStream resource = this.fileService.getResource(path, imageName);
-	        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-	        StreamUtils.copy(resource,response.getOutputStream())   ;
-
+		// Post method for file upload
+	    @PostMapping("/exam/file/upload/{examId}")
+	    public ResponseEntity<ExamDto> uploadExamFile(@RequestParam("file") MultipartFile file,
+	                                                  @PathVariable Integer examId) throws IOException {
+	        ExamDto examDto = this.examService.getExamById(examId);
+	        String fileName = this.fileService.uploadFile(path, file);
+	        examDto.setImageName(fileName);  // Assuming you want to set the uploaded file name as imageName
+	        ExamDto updatedExam = this.examService.updateExam(examDto, examId);
+	        return new ResponseEntity<>(updatedExam, HttpStatus.OK);
 	    }
-}
+		
+	 // Method to serve files
+	    @GetMapping(value = "/exam/file/{fileName}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_PDF_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	    public void downloadFile(@PathVariable("fileName") String fileName, HttpServletResponse response) throws IOException {
+	        InputStream resource = this.fileService.getResource(path, fileName);
+	        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+
+	        if ("jpg".equals(fileExtension) || "jpeg".equals(fileExtension) || "png".equals(fileExtension)) {
+	            response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+	        } else if ("pdf".equals(fileExtension)) {
+	            response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+	        } else if ("pptx".equals(fileExtension)) {
+	            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+	        }
+
+	        StreamUtils.copy(resource, response.getOutputStream());
+	    }
+	}
+

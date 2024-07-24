@@ -40,7 +40,6 @@ public class UserController {
 	}
 
 	// PUT- update user
-
 	@PutMapping("/{userId}")
 	public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable("userId") Integer uid) {
 		UserDto updatedUser = this.userService.updateUser(userDto, uid);

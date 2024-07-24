@@ -1,5 +1,6 @@
 package com.e_learning.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +48,7 @@ public class ExamServiceImpl implements ExamService{
 	        Exam exam = this.modelMapper.map(examDto, Exam.class);
 	        exam.setImageName("default.png");
 	        
-	        exam.setAddedDate(new Date());
+	        exam.setAddedDate(LocalDateTime.now()); 
 	        exam.setUser(user);
 	        exam.setCategory(category);
 

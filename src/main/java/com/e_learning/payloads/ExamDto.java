@@ -1,5 +1,6 @@
 package com.e_learning.payloads;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ public class ExamDto {
   
   private String imageName;
   
-  private Date addedDate;
+  private LocalDateTime addedDate;
   
   private String  deadline;
   

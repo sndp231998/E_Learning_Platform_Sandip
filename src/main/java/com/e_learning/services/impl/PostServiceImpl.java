@@ -1,5 +1,6 @@
 package com.e_learning.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -61,8 +62,7 @@ public class PostServiceImpl implements PostService {
 
         Post post = this.modelMapper.map(postDto, Post.class);
         post.setImageName("default.png");
-        
-        post.setAddedDate(new Date());
+        post.setAddedDate(LocalDateTime.now()); 
         post.setUser(user);
         post.setCategory(category);
 

@@ -2,6 +2,7 @@ package com.e_learning.payloads;
 
 
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class PostDto {
 	
 	private String videoLink;
 	
-	private Date addedDate;	
+	private LocalDateTime addedDate;	
 	
 	private CategoryDto category;
 

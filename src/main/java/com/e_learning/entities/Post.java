@@ -1,6 +1,7 @@
 package com.e_learning.entities;
 
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.*;
@@ -28,7 +29,7 @@ public class Post {
     
     private String videoLink;
 
-    private Date addedDate;
+    private LocalDateTime addedDate;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

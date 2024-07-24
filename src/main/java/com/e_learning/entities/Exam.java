@@ -1,5 +1,6 @@
 package com.e_learning.entities;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -24,7 +25,7 @@ public class Exam {
 	    
 	    private String imageName;
 	    
-	    private Date addedDate;
+	    private LocalDateTime addedDate;
 	    
 	    private String  deadline;
 	    
