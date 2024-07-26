@@ -1,5 +1,6 @@
 package com.e_learning.entities;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +48,13 @@ public class User implements UserDetails {
     private String collegename;
 
     private String faculty;
+    
+    private LocalDateTime SubscriptionValidDate;
+    
+    private LocalDateTime date_Of_Role_Changed;
+    
+    private LocalDateTime lastNotificationDate;
+    
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();

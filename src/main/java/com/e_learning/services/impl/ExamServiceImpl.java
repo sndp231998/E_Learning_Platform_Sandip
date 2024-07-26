@@ -152,10 +152,11 @@ public class ExamServiceImpl implements ExamService{
 	        return examDtos;
 	}
 
+	//get all
 	@Override
 	public List<ExamDto> getExams() {
-		List<Exam> categories = this.examRepo.findAll();
-		List<ExamDto> examDtos = categories.stream().map((exa) -> this.modelMapper.map(exa, ExamDto.class))
+		List<Exam> ex = this.examRepo.findAll();
+		List<ExamDto> examDtos = ex.stream().map((exa) -> this.modelMapper.map(exa, ExamDto.class))
 				.collect(Collectors.toList());
 
 		return examDtos;

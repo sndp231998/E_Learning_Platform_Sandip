@@ -1,5 +1,6 @@
 package com.e_learning.payloads;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,6 +38,12 @@ public class UserDto {
 	private String collegename;
 	
 	private String faculty;
+	
+	private LocalDateTime SubscriptionValidDate;
+	
+	private LocalDateTime date_Of_Role_Changed;
+	
+	private LocalDateTime lastNotificationDate;
 	
 	private Set<RoleDto> roles = new HashSet<>();
 	

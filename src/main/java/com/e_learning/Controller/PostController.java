@@ -82,26 +82,6 @@ public class PostController {
 	        return new ResponseEntity<>(posts, HttpStatus.OK);
 	    }
 	
-////	get Posts by category title
-//	
-//	@GetMapping("/category/title/{title}")
-//    public ResponseEntity<List<PostDto>> getPostsByCategoryTitle(@PathVariable String title) {
-//        List<PostDto> posts = postService.getPostsByCategoryTitle(title);
-//        if (posts.isEmpty()) {
-//            System.out.println("No posts found for category title: " + title);
-//            return ResponseEntity.noContent().build(); // HTTP 204 No Content
-//        }
-//        return ResponseEntity.ok(posts);
-//    }
-
-	
-//	 @GetMapping("/category/{categoryTitle}/user/{userId}")
-//	    public ResponseEntity<List<PostDto>> getPostsByCategoryTitle(
-//	            @PathVariable String categoryTitle,
-//	            @PathVariable Integer userId) {
-//	        List<PostDto> posts = postService.getPostsByCategoryTitle(categoryTitle, userId);
-//	        return ResponseEntity.ok(posts);
-//	    }
 
 	// get all posts
 
