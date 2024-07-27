@@ -3,9 +3,6 @@ package com.e_learning.services;
 import java.util.List;
 
 import com.e_learning.payloads.CategoryDto;
-import com.e_learning.payloads.UserDto;
-
-
 
 public interface CategoryService {
 

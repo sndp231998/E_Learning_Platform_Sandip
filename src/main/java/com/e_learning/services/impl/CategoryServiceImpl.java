@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Category;
-import com.e_learning.entities.User;
+
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.CategoryDto;
-import com.e_learning.payloads.UserDto;
+
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.services.CategoryService;
 
