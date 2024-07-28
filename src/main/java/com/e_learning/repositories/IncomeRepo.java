@@ -1,5 +1,6 @@
 package com.e_learning.repositories;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,4 +11,5 @@ import com.e_learning.entities.Income;
 public interface IncomeRepo extends JpaRepository<Income,Integer>{
 
 	List<Income> findByIncomedateBetween(LocalDateTime start, LocalDateTime end);
+	List<Income> findByIncomedate(LocalDate date);
 }

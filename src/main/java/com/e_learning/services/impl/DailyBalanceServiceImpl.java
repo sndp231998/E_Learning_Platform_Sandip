@@ -1,7 +1,8 @@
 package com.e_learning.services.impl;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -14,12 +15,15 @@ import com.e_learning.entities.DailyBalance;
 import com.e_learning.entities.Expense;
 import com.e_learning.entities.Income;
 import com.e_learning.exceptions.ResourceNotFoundException;
-
 import com.e_learning.payloads.DailyBalanceDto;
+import com.e_learning.payloads.DayWiseDataDto;
+import com.e_learning.payloads.ExpenseDto;
+import com.e_learning.payloads.IncomeDto;
 import com.e_learning.repositories.DailyBalanceRepo;
 import com.e_learning.repositories.ExpenseRepo;
 import com.e_learning.repositories.IncomeRepo;
 import com.e_learning.services.DailyBalanceService;
+
 @Service
 public class DailyBalanceServiceImpl implements DailyBalanceService {
 
@@ -40,41 +44,73 @@ public class DailyBalanceServiceImpl implements DailyBalanceService {
     @Override
     public DailyBalanceDto createBalance(DailyBalanceDto dailyBalanceDto) {
 
-        List<Income> incomes = this.incomeRepo.findAll(); // Replace with actual method
-        List<Expense> expenses = this.expenseRepo.findAll(); // Replace with actual method
+        List<Income> incomes = this.incomeRepo.findAll();
+        List<Expense> expenses = this.expenseRepo.findAll();
 
-        if (!incomes.isEmpty() && !expenses.isEmpty()) {
-            double totalIncome = incomes.stream().mapToDouble(Income::getAmount).sum();
-            double totalExpense = expenses.stream().mapToDouble(Expense::getAmount).sum();
+        double totalIncome = incomes.stream().mapToDouble(Income::getAmount).sum();
+        double totalExpense = expenses.stream().mapToDouble(Expense::getAmount).sum();
 
-            dailyBalanceDto.setTotalincome(totalIncome);
-            dailyBalanceDto.setTotalexpense(totalExpense);
-            dailyBalanceDto.setDate(LocalDateTime.now());
+        // Get the current date without time
+        LocalDate today = LocalDate.now();
+        Optional<DailyBalance> dailyBalanceOptional = this.dailyBalanceRepo.findByDate(today);
 
-            if (totalIncome > totalExpense) {
-                dailyBalanceDto.setProfit(totalIncome - totalExpense);
-            } else if (totalIncome < totalExpense) {
-                dailyBalanceDto.setLoss(totalExpense - totalIncome);
-            } else {
-                dailyBalanceDto.setProfit(0.0);
-                dailyBalanceDto.setLoss(0.0);
-            }
-
-            DailyBalance dailyBalance = this.modelMapper.map(dailyBalanceDto, DailyBalance.class);
-            dailyBalance = this.dailyBalanceRepo.save(dailyBalance);
-            return this.modelMapper.map(dailyBalance, DailyBalanceDto.class);
+        logger.info("seeing " + dailyBalanceOptional);
+        DailyBalance dailyBalance;
+        if (dailyBalanceOptional.isPresent()) {
+            dailyBalance = dailyBalanceOptional.get();
         } else {
-            throw new IllegalArgumentException("Income or Expense data is missing.");
+            // Create new daily balance
+            dailyBalance = new DailyBalance();
+            dailyBalance.setDate(today);
         }
+
+        dailyBalance.setTotalincome(totalIncome);
+        dailyBalance.setTotalexpense(totalExpense);
+
+        if (totalIncome > totalExpense) {
+            dailyBalance.setProfit(totalIncome - totalExpense);
+            dailyBalance.setLoss(0.0);
+        } else if (totalIncome < totalExpense) {
+            dailyBalance.setLoss(totalExpense - totalIncome);
+            dailyBalance.setProfit(0.0);
+        } else {
+            dailyBalance.setProfit(0.0);
+            dailyBalance.setLoss(0.0);
+        }
+
+        dailyBalance = this.dailyBalanceRepo.save(dailyBalance);
+        return this.modelMapper.map(dailyBalance, DailyBalanceDto.class);
     }
 
     @Override
     public List<DailyBalanceDto> getDailyBalances() {
-    	List<DailyBalance> dailyblc = this.dailyBalanceRepo.findAll();
-		List<DailyBalanceDto> DblcDtos = dailyblc.stream().map((cat) -> this.modelMapper.map(cat, DailyBalanceDto.class))
-				.collect(Collectors.toList());
+        List<DailyBalance> dailyblc = this.dailyBalanceRepo.findAll();
+        List<DailyBalanceDto> DblcDtos = dailyblc.stream()
+                .map((cat) -> this.modelMapper.map(cat, DailyBalanceDto.class))
+                .collect(Collectors.toList());
 
-		return DblcDtos;
+        return DblcDtos;
+    }
+
+    @Override
+    public DayWiseDataDto getDayWiseData(LocalDate date) {
+        List<Income> incomes = this.incomeRepo.findByIncomedate(date);
+        List<Expense> expenses = this.expenseRepo.findByExpensedate(date);
+        Optional<DailyBalance> dailyBalanceOpt = this.dailyBalanceRepo.findByDate(date);
+
+        DayWiseDataDto dayWiseDataDto = new DayWiseDataDto();
+        dayWiseDataDto.setExpenses(expenses.stream()
+                .map(expense -> this.modelMapper.map(expense, ExpenseDto.class))
+                .collect(Collectors.toList()));
+        dayWiseDataDto.setIncomes(incomes.stream()
+                .map(income -> this.modelMapper.map(income, IncomeDto.class))
+                .collect(Collectors.toList()));
+
+        dailyBalanceOpt.ifPresent(dailyBalance -> 
+            dayWiseDataDto.setDailyBalance(this.modelMapper.map(dailyBalance, DailyBalanceDto.class))
+        );
+
+        return dayWiseDataDto;
     }
 
     @Override

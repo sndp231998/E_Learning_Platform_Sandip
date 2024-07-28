@@ -1,5 +1,6 @@
 package com.e_learning.entities;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -18,12 +19,12 @@ public class DailyBalance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    private LocalDateTime date;
+    private LocalDate date;
     
-    private double profit;  // Carry forward profit
-    private double loss;  // Carry forward loss//private double closingBalance;
+    private double profit;  
+    private double loss;  
     
-    //private boolean iisPositive;
+ 
     
     private double totalincome;
     private double totalexpense;

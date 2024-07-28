@@ -1,5 +1,6 @@
 package com.e_learning.services.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class IncomeServiceImpl implements IncomeService{
 	        
 	        Income income = modelMapper.map(incomeDto, Income.class);
 	        income.setUser(user);
-	        income.setIncomedate((LocalDateTime.now()));
+	        income.setIncomedate((LocalDate.now()));
 	        
 	        
 	        Income savedIncome = incomeRepo.save(income);

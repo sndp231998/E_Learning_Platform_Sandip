@@ -1,5 +1,6 @@
 package com.e_learning.services.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,10 +36,10 @@ public class ExpenseServiceImpl implements ExpenseService{
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         
         Expense expense = modelMapper.map(expenseDto, Expense.class);
-        expense.setExpensedate((LocalDateTime.now()));
+        expense.setExpensedate((LocalDate.now()));
         
         expense.setUser(user);
-        
+       
         Expense savedExpense = expenseRepo.save(expense);
         
         return modelMapper.map(savedExpense, ExpenseDto.class);

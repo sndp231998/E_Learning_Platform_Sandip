@@ -1,11 +1,13 @@
 package com.e_learning.services;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
 import com.e_learning.entities.DailyBalance;
 import com.e_learning.payloads.CategoryDto;
 import com.e_learning.payloads.DailyBalanceDto;
+import com.e_learning.payloads.DayWiseDataDto;
 import com.e_learning.payloads.PostDto;
 
 public interface DailyBalanceService {
@@ -21,5 +23,6 @@ public interface DailyBalanceService {
 	//get single
 	DailyBalance get(Integer Id);
 	
-	
+	 
+	 DayWiseDataDto getDayWiseData(LocalDate date);
 }

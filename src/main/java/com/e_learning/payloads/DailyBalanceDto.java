@@ -1,5 +1,6 @@
 package com.e_learning.payloads;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.GeneratedValue;
@@ -16,13 +17,11 @@ public class DailyBalanceDto {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Integer id;
 	    
-	    private LocalDateTime date;
+	    private LocalDate date;
 	    
-	    private double profit;  // Carry forward profit
-	    private double loss;  // Carry forward loss//private double closingBalance;
-	    
-	    
-	    
+	    private double profit;  
+	    private double loss;  
+	  
 	    private double totalincome;
 	    private double totalexpense;
 }

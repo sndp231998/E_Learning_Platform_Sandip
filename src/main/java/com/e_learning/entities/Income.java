@@ -1,6 +1,7 @@
 package com.e_learning.entities;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -8,6 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+
+import com.e_learning.payloads.UserDto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +23,7 @@ public class Income {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer incomeId;
 	
-		private LocalDateTime incomedate;
+		private LocalDate incomedate;
 		
 		private String particular;
 		
