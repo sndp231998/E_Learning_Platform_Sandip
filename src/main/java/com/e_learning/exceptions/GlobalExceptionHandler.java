@@ -8,9 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.e_learning.payloads.ApiResponse;
+
 
 
 
@@ -43,5 +46,10 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.BAD_REQUEST);
 	}
 
-
+	 @ExceptionHandler(RateLimitExceededException.class)
+	    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+	    @ResponseBody
+	    public String handleRateLimitExceededException(RateLimitExceededException ex) {
+	        return ex.getMessage();
+	    }
 }

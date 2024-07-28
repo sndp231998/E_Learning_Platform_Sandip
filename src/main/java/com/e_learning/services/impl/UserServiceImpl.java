@@ -153,9 +153,9 @@ public class UserServiceImpl implements UserService {
                 .map(user -> modelMapper.map(user, UserDto.class))
                 .collect(Collectors.toList());
     }
-
+//1800000==30 min
     @Override
-    @Scheduled(fixedRate = 120000) // Runs every 2 minutes
+    @Scheduled(fixedRate =120000) // Runs every 2 minutes
     public void updateUserRoles() {
         logger.info("updateUserRoles method started");
         List<User> users = userRepo.findAll();

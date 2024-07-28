@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.e_learning.payloads.ApiResponse;
 import com.e_learning.payloads.UserDto;
 import com.e_learning.services.UserService;
+import com.e_learning.services.impl.RateLimitingService;
 
 
 
@@ -31,6 +32,9 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	
+	 @Autowired
+	    private RateLimitingService rateLimitingService;
 
 	// POST-create user
 	@PostMapping("/")
@@ -58,6 +62,7 @@ public class UserController {
 	// GET - user get
 	@GetMapping("/")
 	public ResponseEntity<List<UserDto>> getAllUsers() {
+		 rateLimitingService.checkRateLimit("test-api-key");
 		return ResponseEntity.ok(this.userService.getAllUsers());
 	}
 
