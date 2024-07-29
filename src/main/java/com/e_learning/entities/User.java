@@ -42,6 +42,8 @@ public class User implements UserDetails {
 
     @Column(unique = true)
     private String email;
+    
+   private String mobileNo;
 
     private String password;
 

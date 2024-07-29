@@ -18,5 +18,9 @@ public class AnswerDto {
 	 private LocalDateTime addedDate;
 	 
 	
-	private Exam exam;
+	private ExamDto exam;
+	
+	private UserDto user;
+	
+	
 }

@@ -14,7 +14,9 @@ import com.e_learning.entities.User;
 public interface ExamRepo extends JpaRepository<Exam, Integer>{
 
 	List<Exam> findByCategory(Category category);
+	//List<Exam> findByCategory(String categoryTitle);
 	List<Exam> findByUser(User user);
 	@Query("select e from Exam e where e.title like :key")
 	List<Exam> searchByTitle(@Param("key") String title);
+
 }

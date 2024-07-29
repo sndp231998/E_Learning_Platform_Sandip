@@ -28,7 +28,6 @@ public class PaymentDto {
 	    private String payment_screensort;
 	    
 	    private String faculty;
-	    
-	    @ManyToOne
-	    private User user;
+	
+	    private UserDto user;
 }

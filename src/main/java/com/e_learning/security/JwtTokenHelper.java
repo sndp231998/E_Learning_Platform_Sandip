@@ -15,7 +15,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtTokenHelper {
 
-
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
 
@@ -25,7 +24,11 @@ public class JwtTokenHelper {
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
-
+    // Retrieve user ID from token
+//    public String getUserIdFromToken(String token) {
+//        final Claims claims = getAllClaimsFromToken(token);
+//        return (String) claims.get("userId");
+//    }
     //retrieve expiration date from jwt token
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);

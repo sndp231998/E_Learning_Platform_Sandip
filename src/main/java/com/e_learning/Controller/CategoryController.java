@@ -33,6 +33,8 @@ public class CategoryController {
 
 	@PostMapping("/")
 	public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto cateogDto) {
+		
+
 		CategoryDto createCategory = this.categoryService.createCategory(cateogDto);
 		return new ResponseEntity<CategoryDto>(createCategory, HttpStatus.CREATED);
 	}

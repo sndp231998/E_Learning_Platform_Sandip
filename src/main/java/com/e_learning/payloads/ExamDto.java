@@ -31,5 +31,5 @@ public class ExamDto {
   
 	private CategoryDto category;
 
-	private UserDto user;
+	//private UserDto user;
 }

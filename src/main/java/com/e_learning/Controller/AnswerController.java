@@ -2,6 +2,7 @@ package com.e_learning.Controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +25,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e_learning.entities.User;
 import com.e_learning.payloads.AnswerDto;
 import com.e_learning.payloads.ApiResponse;
-
+import com.e_learning.payloads.ExamDto;
+import com.e_learning.payloads.UserDto;
 import com.e_learning.services.AnswerService;
 import com.e_learning.services.FileService;
 
@@ -41,12 +46,37 @@ public class AnswerController {
 	@Value("${project.image}")
 	private String path;
 	
-	@PostMapping("/answer/{answerId}/answers")
-	public ResponseEntity<AnswerDto> createAnswer(@RequestBody AnswerDto answer, @PathVariable Integer examId) {
 
-		AnswerDto createAnswer = this.answerService.createAnswer(answer, examId);
-		return new ResponseEntity<AnswerDto>(createAnswer, HttpStatus.CREATED);
+//	 @GetMapping("/answers/category/{categoryTitle}")
+//	    public ResponseEntity<List<AnswerDto>> getAnswersByCategoryTitle(@PathVariable String categoryTitle) {
+//	        List<AnswerDto> answers = answerService.findByExamCategory(categoryTitle);
+//	        return ResponseEntity.ok(answers);
+//	    }
+	 
+	
+	@PostMapping("/user/{userId}/exam/{examId}/answers")
+	public ResponseEntity<AnswerDto> createAnswer(@RequestBody AnswerDto answer, 
+	                                               @PathVariable Integer userId, 
+	                                               @PathVariable Integer examId) {
+	    // Extract the user ID from the authentication context
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    User userDetails = (User) authentication.getPrincipal();
+	    Integer tokenUserId = userDetails.getId(); // Get the user ID from the token
+
+	    System.out.println("User ID=from token=========" + tokenUserId);
+	    System.out.println("User ID of user===========" + userId);
+	    System.out.println("Exam Id===========" + examId);
+
+	    // Compare the user ID from the token with the user ID from the path variable
+	    if (!tokenUserId.equals(userId)) {
+	        return new ResponseEntity<>(HttpStatus.FORBIDDEN); // 403 Forbidden
+	    }
+
+	    // Create the answer
+	    AnswerDto createAnswer = this.answerService.createAnswer(answer, examId, userId);
+	    return new ResponseEntity<>(createAnswer, HttpStatus.CREATED);
 	}
+
 
 	@DeleteMapping("/answers/{answerId}")
 	public ResponseEntity<ApiResponse> deleteAnswer(@PathVariable Integer answerId) {
@@ -99,5 +129,7 @@ public class AnswerController {
 
         StreamUtils.copy(resource, response.getOutputStream());
     }
-
+    
+    
+  
 }

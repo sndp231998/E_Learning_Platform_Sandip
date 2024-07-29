@@ -101,6 +101,7 @@ public class ExamServiceImpl implements ExamService{
 		 Category cat = this.categoryRepo.findById(categoryId)
 	                .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
 	        List<Exam> exams = this.examRepo.findByCategory(cat);
+	        		
 
 	        List<ExamDto> examDtos = exams.stream().map((exam) -> this.modelMapper.map(exam, ExamDto.class))
 	                .collect(Collectors.toList());
@@ -119,7 +120,7 @@ public class ExamServiceImpl implements ExamService{
 
         return examDtos;
 	}
-
+//yo user lai dekhaune
 	@Override
 	public List<ExamDto> getExamsByUserFaculty(Integer userId) {
 		// Retrieve user by ID

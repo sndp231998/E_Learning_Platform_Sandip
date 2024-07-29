@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,9 +26,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e_learning.entities.User;
 import com.e_learning.payloads.ApiResponse;
 
 import com.e_learning.payloads.ExamDto;
+import com.e_learning.payloads.IncomeDto;
 import com.e_learning.services.ExamService;
 import com.e_learning.services.FileService;
 
@@ -47,7 +51,18 @@ public class ExamController {
 	@PostMapping("/user/{userId}/category/{categoryId}/exams")
 	public ResponseEntity<ExamDto> createExam(@RequestBody ExamDto examDto, @PathVariable Integer userId,
 			@PathVariable Integer categoryId) {
-		ExamDto createExam = this.examService.createExam(examDto, userId, categoryId);
+		 // Extract the user ID from the authentication context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User userDetails = (User) authentication.getPrincipal();
+        Integer tokenUserId = userDetails.getId(); // Get the user ID from the token
+
+        // Compare the user ID from the token with the user ID from the path variable
+        if (!tokenUserId.equals(userId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // 403 Forbidden
+        }
+        
+        ExamDto createExam = this.examService.createExam(examDto, userId, categoryId);
+		
 		return new ResponseEntity<ExamDto>(createExam, HttpStatus.CREATED);
 	}
 	

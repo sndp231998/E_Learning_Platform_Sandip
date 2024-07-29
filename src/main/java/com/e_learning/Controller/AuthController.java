@@ -1,7 +1,5 @@
 package com.e_learning.Controller;
 
-import java.security.Principal;
-
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
@@ -28,11 +26,12 @@ import com.e_learning.repositories.UserRepo;
 import com.e_learning.security.JwtTokenHelper;
 import com.e_learning.services.UserService;
 
-
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/auth/")
 public class AuthController {
+
 	@Autowired
 	private JwtTokenHelper jwtTokenHelper;
 
@@ -94,5 +93,3 @@ public class AuthController {
 	}
 
 }
-
-

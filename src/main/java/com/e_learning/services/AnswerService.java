@@ -1,11 +1,14 @@
 package com.e_learning.services;
 
+import java.util.List;
+
 import com.e_learning.payloads.AnswerDto;
 import com.e_learning.payloads.ExamDto;
+import com.e_learning.payloads.UserDto;
 
 
 public interface AnswerService {
-	AnswerDto createAnswer(AnswerDto answerDto, Integer examId);
+	AnswerDto createAnswer(AnswerDto answerDto, Integer examId, Integer userId);
 
 	void deleteAnswer(Integer answerId);
 	
@@ -13,7 +16,11 @@ public interface AnswerService {
 
 	AnswerDto updateAnswer(AnswerDto answerDto, Integer answerId);
 	
-	//get single post
+	//get single answer
 	
 	AnswerDto getAnswerById(Integer answerId);
+	
+	//List<AnswerDto> findByExamCategory(String categoryTitle);
+	
+	
 }

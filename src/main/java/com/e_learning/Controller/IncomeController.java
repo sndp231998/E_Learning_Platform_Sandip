@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.e_learning.entities.User;
 import com.e_learning.payloads.ExpenseDto;
 import com.e_learning.payloads.IncomeDto;
+
 import com.e_learning.services.IncomeService;
 
 @RestController
@@ -31,14 +33,15 @@ public class IncomeController {
 	@PostMapping("/user/{userId}/incomes")
 	public ResponseEntity<IncomeDto> createIncome(@RequestBody IncomeDto incomeDto, @PathVariable Integer userId) {
 		
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
-		 // Check if the authenticated user ID matches the provided user ID
-//        if (!authenticatedUserId.equals(userId)) {
-//            throw new UnauthorizedException("You are not authorized to create income for this user");
-//        }
-        
-		IncomeDto createIncome = this.incomeService.createIncome(incomeDto, userId);
+		 // Extract the user ID from the authentication context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User userDetails = (User) authentication.getPrincipal();
+        Integer tokenUserId = userDetails.getId(); // Get the user ID from the token
+
+        // Compare the user ID from the token with the user ID from the path variable
+        if (!tokenUserId.equals(userId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // 403 Forbidden
+        }		IncomeDto createIncome = this.incomeService.createIncome(incomeDto, userId);
 				
 		return new ResponseEntity<IncomeDto>(createIncome, HttpStatus.CREATED);
 	}
