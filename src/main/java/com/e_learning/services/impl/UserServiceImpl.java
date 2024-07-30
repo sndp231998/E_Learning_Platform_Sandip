@@ -1,8 +1,11 @@
 package com.e_learning.services.impl;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -12,13 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.e_learning.config.AppConstants;
+import com.e_learning.entities.OtpRequest;
 import com.e_learning.entities.Payment;
 import com.e_learning.entities.Role;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.UserDto;
+import com.e_learning.repositories.OtpRequestRepo;
 import com.e_learning.repositories.PaymentRepo;
 import com.e_learning.repositories.RoleRepo;
 import com.e_learning.repositories.UserRepo;
@@ -34,6 +40,8 @@ public class UserServiceImpl implements UserService {
     private UserRepo userRepo;
 
     @Autowired
+    private OtpRequestRepo otpRepo;
+    @Autowired
     private ModelMapper modelMapper;
 
     @Autowired
@@ -48,6 +56,58 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private NotificationService notificationService;
 
+
+    
+    @Override
+    public UserDto registerNewUser(UserDto userDto) {
+        User user = this.modelMapper.map(userDto, User.class);
+     // encoded the password
+     		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+     		// roles
+    		Role role = this.roleRepo.findById(AppConstants.NORMAL_USER).get();
+    		user.getRoles().add(role);
+        String otp = userDto.getOtp();
+        
+        // Logging OTP from user
+        logger.info("Otp from user: " + otp);
+        
+        if (otp == null) {
+            throw new IllegalArgumentException("OTP must be provided");
+        }
+
+        // Get OTP requests from the repository
+        List<OtpRequest> otpRequests = this.otpRepo.findByOtp(otp);
+        logger.info("Retrieved OTP requests: " + otpRequests);
+        
+        // Iterate through each OTP request and check validity
+        OtpRequest validOtpRequest = null;
+        for (OtpRequest otpRequest : otpRequests) {
+            // Null check before comparison
+            if (otpRequest.getOtp() != null && otpRequest.getOtp().equals(otp)) {
+                LocalDateTime otpValidUntil = otpRequest.getOtpValidUntil();
+                if (otpValidUntil != null) {
+                    Instant otpValidUntilInstant = otpValidUntil.atZone(ZoneId.systemDefault()).toInstant();
+                    Instant now = Instant.now();
+                    if (otpValidUntilInstant.isAfter(now)) {
+                        validOtpRequest = otpRequest;
+                        break; // Exit the loop if a valid OTP is found
+                    }
+                }
+            }
+        }
+        
+        if (validOtpRequest == null) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+        
+        String mobileNo = validOtpRequest.getMobileNo();
+        user.setMobileNo(mobileNo);
+        
+        User newUser = this.userRepo.save(user);
+        return this.modelMapper.map(newUser, UserDto.class);
+    }
+
+    
     @Override
     public UserDto createUser(UserDto userDto) {
         User user = this.dtoToUser(userDto);
@@ -98,15 +158,10 @@ public class UserServiceImpl implements UserService {
         return this.modelMapper.map(user, UserDto.class);
     }
 
-    @Override
-    public UserDto registerNewUser(UserDto userDto) {
-        User user = this.modelMapper.map(userDto, User.class);
-        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-        Role role = this.roleRepo.findById(AppConstants.NORMAL_USER).get();
-        user.getRoles().add(role);
-        User newUser = this.userRepo.save(user);
-        return this.modelMapper.map(newUser, UserDto.class);
-    }
+    
+ 
+    // other methods
+
 
     @Override
     public List<UserDto> getUsersByCollegeName(String collegename) {
@@ -225,4 +280,6 @@ public class UserServiceImpl implements UserService {
 
         logger.info("sendSubscriptionExpiryWarnings method completed");
     }
+
+	
 }

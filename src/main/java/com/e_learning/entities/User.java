@@ -42,11 +42,17 @@ public class User implements UserDetails {
 
     @Column(unique = true)
     private String email;
-    
-   private String mobileNo;
-
+     
     private String password;
+//---------------------------------------
+    private String mobileNo;
 
+    @Column(name = "otp")
+    private String otp;
+
+    private LocalDateTime otpValidUntil;
+    //------------------------------------------
+    
     private String collegename;
 
     private String faculty;

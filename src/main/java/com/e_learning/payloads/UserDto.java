@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -39,6 +40,9 @@ public class UserDto {
 	
 	private String faculty;
 	
+	 @Column(name = "otp")
+   private String otp;
+	
 //	private LocalDateTime SubscriptionValidDate;
 //	
 //	private LocalDateTime date_Of_Role_Changed;
@@ -47,7 +51,13 @@ public class UserDto {
 	
 	private Set<RoleDto> roles = new HashSet<>();
 	
-	
+	//---------------------------------------
+//    private String mobileNo;
+//
+//   
+//
+//    private LocalDateTime otpValidUntil;
+    //------------------------------------------
 	@JsonIgnore
 	public String getPassword() {
 		return this.password;
