@@ -106,14 +106,59 @@ public class UserServiceImpl implements UserService {
         User newUser = this.userRepo.save(user);
         return this.modelMapper.map(newUser, UserDto.class);
     }
-
     
+  
+    //forget password----------------
+    //get otp from user 
     @Override
-    public UserDto createUser(UserDto userDto) {
-        User user = this.dtoToUser(userDto);
-        User savedUser = this.userRepo.save(user);
-        return this.userToDto(savedUser);
+    public UserDto GetOtp(UserDto userDto, Integer userId) {
+        User user = this.userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        // Saving OTP to User table (optional step)
+        user.setOtp(userDto.getOtp());
+        
+        // Save and return updated user with OTP
+        return modelMapper.map(userRepo.save(user), UserDto.class);
     }
+    
+    //forget password 
+	@Override
+	public UserDto updatePassword(UserDto userDto, Integer userId) {
+		User user = this.userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+		String otp=userDto.getOtp();
+		if(otp==null) {
+			throw new IllegalArgumentException("OTP must be provided");
+		}
+		// Fetch the OTP from the database
+	    List<OtpRequest> otpRequests = this.otpRepo.findByOtp(otp);
+	    OtpRequest validOtpRequest = null;
+	    for (OtpRequest otpRequest : otpRequests) {
+	        if (otpRequest.getOtp() != null && otpRequest.getOtp().equals(otp)) {
+	            LocalDateTime otpValidUntil = otpRequest.getOtpValidUntil();
+	            if (otpValidUntil != null) {
+	                Instant otpValidUntilInstant = otpValidUntil.atZone(ZoneId.systemDefault()).toInstant();
+	                Instant now = Instant.now();
+	                if (otpValidUntilInstant.isAfter(now)) {
+	                    validOtpRequest = otpRequest;
+	                    break; // Found valid OTP, exit loop
+	                }
+	            }
+	        }
+	    }
+	    if (validOtpRequest == null) {
+	        throw new IllegalArgumentException("Invalid or expired OTP");
+	    }
+	    // OTP is valid, proceed to update the password
+	    user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+	    User updatedUser = userRepo.save(user);
+
+	    return modelMapper.map(updatedUser, UserDto.class);
+		
+	}
+    
 
     @Override
     public UserDto updateUser(UserDto userDto, Integer userId) {
@@ -128,6 +173,14 @@ public class UserServiceImpl implements UserService {
         User updatedUser = this.userRepo.save(user);
         return this.userToDto(updatedUser);
     }
+    
+    @Override
+    public UserDto createUser(UserDto userDto) {
+        User user = this.dtoToUser(userDto);
+        User savedUser = this.userRepo.save(user);
+        return this.userToDto(savedUser);
+    }
+
 
     @Override
     public UserDto getUserById(Integer userId) {
@@ -280,6 +333,11 @@ public class UserServiceImpl implements UserService {
 
         logger.info("sendSubscriptionExpiryWarnings method completed");
     }
+
+
+
+
+
 
 	
 }

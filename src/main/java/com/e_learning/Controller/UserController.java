@@ -98,5 +98,8 @@ public class UserController {
         List<UserDto> users = userService.getUsersByRole(roleName);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
-
+//------get -otp from user for forgetpassword ----
+ 
+    
+ 
 }
