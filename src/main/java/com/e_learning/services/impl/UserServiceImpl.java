@@ -28,6 +28,7 @@ import com.e_learning.repositories.OtpRequestRepo;
 import com.e_learning.repositories.PaymentRepo;
 import com.e_learning.repositories.RoleRepo;
 import com.e_learning.repositories.UserRepo;
+import com.e_learning.services.OtpRequestService;
 import com.e_learning.services.UserService;
 
 
@@ -56,7 +57,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private NotificationService notificationService;
 
-
+    @Autowired
+private OtpRequestService sendmsg;
     
     @Override
     public UserDto registerNewUser(UserDto userDto) {
@@ -104,8 +106,16 @@ public class UserServiceImpl implements UserService {
         user.setMobileNo(mobileNo);
         
         User newUser = this.userRepo.save(user);
+        
+        
+        String welcomeMessage = String.format("Welcome, %s! We're excited to have you on our eLearning platform. Dive in and enjoy the journey ahead! Thank you for choosing us, Utkrista Shikshya", user.getName());
+        sendmsg.sendMessage(user.getMobileNo(), welcomeMessage); // Assuming notificationService sends SMS
+
         return this.modelMapper.map(newUser, UserDto.class);
     }
+    
+    
+    
     
   
     //forget password----------------
@@ -270,7 +280,7 @@ public class UserServiceImpl implements UserService {
         logger.info("Number of users found: {}", users.size());
 
         for (User user : users) {
-            if (user.getSubscriptionValidDate() != null) {
+            if (user.getSubscriptionValidDate() != null) { 
                 LocalDateTime validDate = user.getSubscriptionValidDate();
                 logger.info("Processing user: {}, Subscription Valid Date: {}", user.getEmail(), validDate);
 
@@ -336,8 +346,29 @@ public class UserServiceImpl implements UserService {
 
 
 
+//----------------Faculty--------------------------------------------------------
+ // Method to update faculty
+    @Override
+    public UserDto updateFaculty(Integer userId, String faculty) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
+        user.setFaculty(faculty);
+        User updatedUser = userRepo.save(user);
+        return modelMapper.map(updatedUser, UserDto.class);
+    }
 
+    // Method to add new faculty for the user
+    @Override
+    public UserDto addFaculty(Integer userId, String faculty) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        user.setFaculty(faculty); // Adding or updating faculty
+        User savedUser = userRepo.save(user);
+        return modelMapper.map(savedUser, UserDto.class);
+    }
+//----------------------------------------------------------------------------------------------
 
 	
 }

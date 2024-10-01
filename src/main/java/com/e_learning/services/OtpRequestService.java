@@ -11,7 +11,7 @@ public interface OtpRequestService {
 			 // Send OTP
 		    OtpRequest SendOtp(OtpRequest otpReq, String phnumber);
 
-			void sendOtpSm(String mobileNo,String message);
+			void sendMessage(String mobileNo,String message);
 			
 			 void sendOtpSms(String mobileNo,String otp);
 }

@@ -3,6 +3,7 @@ package com.e_learning.services.impl;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Random;
 
@@ -62,7 +63,7 @@ public class ForgetPasswordServiceImpl implements ForgetPasswordService {
                 "Hi Mr./Ms. %s, your OTP is: %s. Please do not share this with anyone.", 
                 userName, otp);
             
-            otpRequestService.sendOtpSm(mobileNo, personalizedMessage);
+            otpRequestService.sendMessage(mobileNo, personalizedMessage);
             logger.debug("OTP sent to mobile number: {}", mobileNo);
             
             // Step 4: Check if ForgetPassword entry already exists for this mobile number
@@ -74,14 +75,14 @@ public class ForgetPasswordServiceImpl implements ForgetPasswordService {
                 // If entry exists, update it
                 forgetPassword = existingForgetPassword.get();
                 forgetPassword.setOtp(otp);  // Update OTP
-                forgetPassword.setDate(Instant.now());  // Update date and time
+                forgetPassword.setDate(LocalDateTime.now());  // Update date and time
                 logger.debug("Updated existing ForgetPassword entry for mobile number: {}", mobileNo);
             } else {
                 // If no entry exists, create a new one
                 forgetPassword = new ForgetPassword();
                 forgetPassword.setPhnum(mobileNo);
                 forgetPassword.setOtp(otp);  // Store the OTP
-                forgetPassword.setDate(Instant.now());  // Set date
+                forgetPassword.setDate(LocalDateTime.now());  // Set date
                 forgetPassword.setUser(user);  // Link user to ForgetPassword entry
                 logger.debug("Created new ForgetPassword entry for mobile number: {}", mobileNo);
             }
@@ -124,48 +125,50 @@ public class ForgetPasswordServiceImpl implements ForgetPasswordService {
 
         if (forgetPasswordOpt.isPresent()) {
             ForgetPassword forgetPassword = forgetPasswordOpt.get();
-            
-            // Step 3: Check if the OTP is expired (10 minutes delay)
-            Instant otpGenerationTime = forgetPassword.getDate();
-            logger.debug("Timeeeeeeee....*************",otpGenerationTime);
-            Instant otpInstant = otpGenerationTime.atZone(ZoneId.systemDefault()).toInstant();
-            Instant currentInstant = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
+
+         // Step 3: Check if the OTP is expired (10 minutes limit)
+            LocalDateTime otpGenerationTime = forgetPassword.getDate(); // OTP creation time
+            LocalDateTime currentTime = LocalDateTime.now(); // Current time
 
             // Logging OTP generation and current times
             logger.debug("OTP generation time: {}", otpGenerationTime);
-            logger.debug("Current time: {}", currentInstant);
+            logger.debug("Current time: {}", currentTime);
+
+            // Calculate expiration time (OTP is valid for 10 minutes)
+            LocalDateTime otpExpirationTime = otpGenerationTime.plusMinutes(10);
 
             // Log the expiration time
-            logger.debug("OTP will expire at: {}", otpGenerationTime.plusMillis(10));
+            logger.debug("OTP will expire at: {}", otpExpirationTime);
 
-            // Step 4: Check for expiration
-            if (otpInstant.plusSeconds(6000).isBefore(currentInstant)) {
+            // Step 4: Check if the OTP has expired
+            if (currentTime.isAfter(otpExpirationTime)) {
                 logger.warn("OTP expired for mobile number: {}", mobileNo);
                 throw new RuntimeException("OTP has expired. Please request a new one.");
             }
 
+
             // Step 5: Validate the OTP
             if (forgetPassword.getOtp().equals(otp)) {
                 logger.debug("OTP validated for mobile number: {}", mobileNo);
-                
+
                 // Step 6: Fetch the associated User
                 Optional<User> userOpt = userRepo.findByMobileNo(mobileNo);
                 
                 if (userOpt.isPresent()) {
                     User user = userOpt.get();
-                    
+
                     // Step 7: Check if the new password is the same as the old password
                     if (passwordEncoder.matches(newPassword, user.getPassword())) {
                         logger.warn("New password cannot be the same as the old password for mobile number: {}", mobileNo);
                         throw new RuntimeException("New password cannot be the same as the old password.");
                     }
-                    
+
                     // Step 8: Encode and update the new password
                     String encodedPassword = passwordEncoder.encode(newPassword);
                     user.setPassword(encodedPassword);
                     userRepo.save(user);  // Save the updated user with the new password
                     logger.debug("Password updated successfully for mobile number: {}", mobileNo);
-                    
+
                     // Optionally, delete the ForgetPassword entry
                     // forgetPasswordRepo.delete(forgetPassword);
                 } else {
@@ -181,4 +184,11 @@ public class ForgetPasswordServiceImpl implements ForgetPasswordService {
             throw new RuntimeException("Forget password request not found for the provided mobile number.");
         }
     }
+
 }
+
+
+//otpReq.setOtpValidUntil(otpValidUntil); // OTP valid for 10 minutes
+//Instant otpInstant = otpGenerationTime.atZone(ZoneId.systemDefault()).toInstant();
+//Instant currentInstant = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
+

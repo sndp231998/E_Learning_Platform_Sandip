@@ -56,7 +56,7 @@ public class OtpRequestServiceImpl implements OtpRequestService {
     
     
     @Override
-    public void sendOtpSm(String mobileNo, String message) {
+    public void sendMessage(String mobileNo, String message) {
         String url = String.format("%s?auth_token=%s&to=%s&text=%s",
                 SMS_API_URL, SMS_API_TOKEN, mobileNo, message);
 
