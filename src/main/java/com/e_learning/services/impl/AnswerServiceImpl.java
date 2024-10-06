@@ -33,14 +33,7 @@ public class AnswerServiceImpl implements AnswerService {
     @Autowired
     private ModelMapper modelMapper;
     
-//    @Override
-//    public List<AnswerDto> findByExamCategory(String categoryTitle) {
-//        List<Answer> answers = answerRepo.findByExamCategory(categoryTitle);
-//        return answers.stream()
-//                      .map(answer -> modelMapper.map(answer, AnswerDto.class))
-//                      .collect(Collectors.toList());
-//    }
-//    
+  
 
 
     @Override
