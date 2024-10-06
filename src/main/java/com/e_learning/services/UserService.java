@@ -28,9 +28,9 @@ UserDto registerNewUser(UserDto user);
 	//--------------------role change------------------------
 	void addRoleToUser(String email, String roleName);
 	
-	void updateUserRoles();
+	//void updateUserRoles();
 	
-	void sendSubscriptionExpiryWarnings();
+	//void sendSubscriptionExpiryWarnings();
 	
     UserDto getUserByEmail(String email);
     

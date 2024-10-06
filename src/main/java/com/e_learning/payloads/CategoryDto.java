@@ -22,4 +22,5 @@ public class CategoryDto {
     private LocalDateTime addedDate;
     private String categoryDescription;
     private String imageName;
+    private LocalDateTime courseValidDate;
 }

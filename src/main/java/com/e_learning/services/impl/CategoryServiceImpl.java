@@ -40,6 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
 		cat.setAddedDate(LocalDateTime.now());
 		cat.setImageName("");
 		cat.setCourseType(categoryDto.getCourseType());
+		cat.setCourseValidDate(categoryDto.getCourseValidDate());
 		Category addedCat = this.categoryRepo.save(cat);
 		return this.modelMapper.map(addedCat, CategoryDto.class);
 	}

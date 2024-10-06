@@ -37,6 +37,8 @@ public class Category {
 	
 	private String mainCategory;
 	
+	 private LocalDateTime courseValidDate;
+	 
 	 private LocalDateTime addedDate;
 
 	private String price;
