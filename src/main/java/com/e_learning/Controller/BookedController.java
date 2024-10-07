@@ -53,9 +53,11 @@ public class BookedController {
 	}
 	
 	@GetMapping("booked/user/{userId}")
-    public ResponseEntity<List<BookedDto>> getBookedCoursesByUserId(@PathVariable Integer userId) {
-        List<BookedDto> bookedCourses = bookedService.getBookedsByCategory(userId);
+    public ResponseEntity<List<BookedDto>> getBookedCoursesByUser(@PathVariable Integer userId) {
+        List<BookedDto> bookedCourses = bookedService.getBookedsByUser(userId);
         		
         return ResponseEntity.ok(bookedCourses);
     }
+	
+
 }

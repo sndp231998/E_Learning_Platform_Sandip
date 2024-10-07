@@ -10,10 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Booked;
 import com.e_learning.entities.Category;
-
+import com.e_learning.entities.Post;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.BookedDto;
+import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.UserDto;
 import com.e_learning.repositories.BookedRepo;
 import com.e_learning.repositories.CategoryRepo;
@@ -79,15 +80,30 @@ public class BookedServiceImpl implements BookedService{
 
 		}
 		
+//		 @Override
+//		    public List<PostDto> getPostsByUser(Integer userId) {
+//
+//		        User user = this.userRepo.findById(userId)
+//		                .orElseThrow(() -> new ResourceNotFoundException("User ", "userId ", userId));
+//		        List<Post> posts = this.postRepo.findByUser(user);
+//
+//		        List<PostDto> postDtos = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
+//		                .collect(Collectors.toList());
+//
+//		        return postDtos;
+//		    }
+
+		
 		@Override
-	    public List<BookedDto> getBookedsByUserId(Integer userId) {
-	        List<Booked> bookedCourses = bookedRepo.findByUserId(userId);
-	        if (bookedCourses.isEmpty()) {
-	            throw new ResourceNotFoundException("Booked Courses", "User id", userId);
-	        }
-	        return bookedCourses.stream()
-	                .map(this::bookedToDto)
+	    public List<BookedDto> getBookedsByUser(Integer userId) {
+			User user = this.userRepo.findById(userId)
+	                .orElseThrow(() -> new ResourceNotFoundException("User ", "userId ", userId));
+	      
+	        List<Booked> bookedCourses = bookedRepo.findByUser(user);
+	        List<BookedDto> bookedDtos = bookedCourses.stream().map((booked) -> this.modelMapper.map(booked, BookedDto.class))
 	                .collect(Collectors.toList());
+
+	        return bookedDtos;
 	    }
 
 		@Override

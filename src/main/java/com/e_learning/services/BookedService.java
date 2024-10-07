@@ -11,7 +11,7 @@ public interface BookedService {
 	BookedDto createBooked(BookedDto bookedDto,Integer userId,Integer categoryId);
 	
 	 List<BookedDto> getBookedsByCategory(Integer categoryId);
-	 List<BookedDto>getBookedsByUserId(Integer userId);
+	 List<BookedDto>getBookedsByUser(Integer userId);
 	List<BookedDto> getAllBookeds();
 	
 }

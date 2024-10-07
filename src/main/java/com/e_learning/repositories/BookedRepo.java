@@ -13,7 +13,7 @@ import com.e_learning.entities.User;
 
 
 public interface BookedRepo extends JpaRepository<Booked, Integer> {
-    List<Booked> findByUserId(Integer userId);
+    List<Booked> findByUser(User user);
 
    
 	List<Booked> findByCategory(Integer categoryId);
