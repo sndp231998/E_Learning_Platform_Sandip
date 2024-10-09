@@ -13,5 +13,6 @@ public interface BookedService {
 	 List<BookedDto> getBookedsByCategory(Integer categoryId);
 	 List<BookedDto>getBookedsByUser(Integer userId);
 	List<BookedDto> getAllBookeds();
+	 boolean isCategoryBookedByUser(Integer userId, Integer categoryId);
 	
 }

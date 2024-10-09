@@ -10,7 +10,7 @@ public interface PaymentService {
 
 	
 	//create
-	PaymentDto createPayment(PaymentDto paymentDto, Integer userId);
+	PaymentDto createPayment(PaymentDto paymentDto, Integer userId, List<Integer> categoryIds);
 	
 	//List<PaymentDto>getPaymentsByFaculty(Integer userId);
 	

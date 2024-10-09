@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
@@ -20,7 +21,7 @@ public class Payment {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Integer paymentId;
 	    
-	    private Integer amount;
+	    private Integer totalPrice;
 	    
 	    private  LocalDateTime addedDate;
 	    
@@ -28,9 +29,14 @@ public class Payment {
 	    
 	    private String payment_screensort;
 	    
-	    private String faculty;
+	   
 	    
 	    @ManyToOne
+	    @JoinColumn(name = "category_id")
+	    private Category category;
+
+	  @ManyToOne
+	  @JoinColumn(name = "user_id") // Specify the foreign key column for the User entity
 	    private User user;
 	
 	   

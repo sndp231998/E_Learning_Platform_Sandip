@@ -18,5 +18,6 @@ public interface BookedRepo extends JpaRepository<Booked, Integer> {
    
 	List<Booked> findByCategory(Integer categoryId);
 	Optional<Booked> findByUserAndCategory(User user, Category category);
+	
 }
 

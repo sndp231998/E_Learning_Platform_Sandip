@@ -59,5 +59,11 @@ public class BookedController {
         return ResponseEntity.ok(bookedCourses);
     }
 	
+	@GetMapping("/check/user/{userId}/category/{categoryId}")
+	public ResponseEntity<Boolean> checkIfCategoryBooked(@PathVariable Integer userId, @PathVariable Integer categoryId) {
+	    boolean isBooked = bookedService.isCategoryBookedByUser(userId, categoryId);
+	    return ResponseEntity.ok(isBooked);
+	}
+	
 
 }

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.e_learning.entities.User;
 import com.e_learning.payloads.ExamDto;
 import com.e_learning.payloads.PaymentDto;
-
+import com.e_learning.payloads.PaymentRequest;
 import com.e_learning.services.FileService;
 import com.e_learning.services.PaymentService;
 
@@ -36,20 +36,28 @@ public class PaymentController {
 	private String path;
 	
 	//create Payment
-		@PostMapping("/user/{userId}/payments")
-		public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentDto paymentDto, @PathVariable Integer userId) {
-			// Extract the user ID from the authentication context
-		    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		    User userDetails = (User) authentication.getPrincipal();
-		    Integer tokenUserId = userDetails.getId(); // Get the user ID from the token
+	@PostMapping("/user/{userId}/payments")
+	public ResponseEntity<PaymentDto> createPayment(
+	        @RequestBody PaymentRequest paymentRequest, 
+	        @PathVariable Integer userId) {
+	    
+	    // Extract the user ID from the authentication context
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    User userDetails = (User) authentication.getPrincipal();
+	    Integer tokenUserId = userDetails.getId(); // Get the user ID from the token
 
-		    // Compare the user ID from the token with the user ID from the path variable
-		    if (!tokenUserId.equals(userId)) {
-		        return new ResponseEntity<>(HttpStatus.FORBIDDEN); // 403 Forbidden
-		    }
-			PaymentDto createPayment = this.paymentService.createPayment(paymentDto, userId);
-			return new ResponseEntity<PaymentDto>(createPayment, HttpStatus.CREATED);
-		}
+	    // Compare the user ID from the token with the user ID from the path variable
+	    if (!tokenUserId.equals(userId)) {
+	        return new ResponseEntity<>(HttpStatus.FORBIDDEN); // 403 Forbidden
+	    }
+
+	    // Call the service to create the payment, passing the selected category IDs
+	    PaymentDto createPayment = this.paymentService.createPayment(
+	        paymentRequest.getPaymentDto(), userId, paymentRequest.getCategoryIds());
+	    
+	    return new ResponseEntity<>(createPayment, HttpStatus.CREATED);
+	}
+
 		
 		//Get all payment
 		@GetMapping("/payments")

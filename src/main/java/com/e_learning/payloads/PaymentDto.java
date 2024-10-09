@@ -19,7 +19,7 @@ public class PaymentDto {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Integer paymentId;
 	    
-	    private Integer amount;
+	    private Integer totalPrice;
 	    
 	    private  LocalDateTime addedDate;
 	    
@@ -27,7 +27,7 @@ public class PaymentDto {
 	    
 	    private String payment_screensort;
 	    
-	    private String faculty;
-	
+	   
 	    private UserDto user;
+	    private CategoryDto category;
 }

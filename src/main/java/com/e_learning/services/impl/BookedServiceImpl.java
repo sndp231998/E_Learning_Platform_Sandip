@@ -51,6 +51,7 @@ public class BookedServiceImpl implements BookedService{
 	     // Check if the user already booked the category
 	        Optional<Booked> existingBooking = this.bookedRepo.findByUserAndCategory(user, category);
 	        if (existingBooking.isPresent()) {
+	        	
 	            throw new IllegalArgumentException("User has already booked this category.");
 	        }
 	        // Proceed with creating the booking
@@ -80,19 +81,6 @@ public class BookedServiceImpl implements BookedService{
 
 		}
 		
-//		 @Override
-//		    public List<PostDto> getPostsByUser(Integer userId) {
-//
-//		        User user = this.userRepo.findById(userId)
-//		                .orElseThrow(() -> new ResourceNotFoundException("User ", "userId ", userId));
-//		        List<Post> posts = this.postRepo.findByUser(user);
-//
-//		        List<PostDto> postDtos = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
-//		                .collect(Collectors.toList());
-//
-//		        return postDtos;
-//		    }
-
 		
 		@Override
 	    public List<BookedDto> getBookedsByUser(Integer userId) {
@@ -117,6 +105,18 @@ public class BookedServiceImpl implements BookedService{
 			return null;
 		}
 
-	
+		@Override
+		 public boolean isCategoryBookedByUser(Integer userId, Integer categoryId) {
+		        User user = this.userRepo.findById(userId)
+		                .orElseThrow(() -> new ResourceNotFoundException("User", "User id", userId));
+		        
+		        Category category = this.categoryRepo.findById(categoryId)
+		                .orElseThrow(() -> new ResourceNotFoundException("Category", "Category id", categoryId));
+		        
+		        Optional<Booked> existingBooking = this.bookedRepo.findByUserAndCategory(user, category);
+		        return existingBooking.isPresent();
+		    }
+
+
 	      
 }
