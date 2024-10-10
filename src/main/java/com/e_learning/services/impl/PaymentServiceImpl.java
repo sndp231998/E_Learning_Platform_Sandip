@@ -45,7 +45,7 @@ public class PaymentServiceImpl implements PaymentService{
         if (categoryIds == null || categoryIds.isEmpty()) {
             throw new IllegalArgumentException("Category IDs cannot be null or empty.");
         }
-        logger.info("list of category id" + categoryIds);
+        logger.info("List of category IDs: " + categoryIds);
 
         // Fetch the selected categories
         List<Category> categories = this.categoryRepo.findAllById(categoryIds);
@@ -61,7 +61,7 @@ public class PaymentServiceImpl implements PaymentService{
         // Check if user already has purchased any of the requested categories
         List<Category> purchasedCategories = this.paymentRepo.findCategoriesByUserId(userId);
         List<Integer> purchasedCategoryIds = purchasedCategories.stream()
-                .map(Category::getCategoryId) // Assuming `getId()` gets the category ID
+                .map(Category::getCategoryId)
                 .collect(Collectors.toList());
 
         // Find intersection of requested and purchased categories
@@ -77,10 +77,8 @@ public class PaymentServiceImpl implements PaymentService{
         int totalPrice = categories.stream()
                 .mapToInt(category -> {
                     try {
-                        // Convert price from String to int
                         return Integer.parseInt(category.getPrice());
                     } catch (NumberFormatException e) {
-                        // Handle invalid price format
                         throw new IllegalArgumentException("Invalid price format for category: " + category.getCategoryId());
                     }
                 })
@@ -91,9 +89,12 @@ public class PaymentServiceImpl implements PaymentService{
 
         // Set user and total price
         payment.setUser(user);
-        payment.setTotalPrice(totalPrice); // Set the dynamically calculated total price
+        payment.setTotalPrice(totalPrice);
         payment.setAddedDate(LocalDateTime.now());
-        payment.setPayment_screensort(""); // Add payment screenshot logic as required
+        payment.setPayment_screensort("");
+        
+        // Set the list of categories
+        payment.setCategories(categories); // Set multiple categories here
 
         // Save the payment
         Payment newPayment = this.paymentRepo.save(payment);
@@ -101,6 +102,7 @@ public class PaymentServiceImpl implements PaymentService{
         // Return the PaymentDto mapped from the newly created payment entity
         return this.modelMapper.map(newPayment, PaymentDto.class);
     }
+
 	@Override
 	public List<PaymentDto> getAllPayments() {
 		List<Payment> pay = this.paymentRepo.findAll();

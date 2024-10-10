@@ -51,4 +51,14 @@ public class Category {
 	private List<Post> posts = new ArrayList<>();
 	
 	
+	
+	 @Override
+	    public String toString() {
+	        return "Category{" +
+	               "categoryId=" + categoryId +
+	               ", categoryTitle='" + categoryTitle + '\'' +
+	               ", price='" + price + '\'' +
+	               // Exclude posts to prevent circular reference
+	               '}';
+	    }
 }

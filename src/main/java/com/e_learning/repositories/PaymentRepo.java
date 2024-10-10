@@ -15,7 +15,12 @@ public interface PaymentRepo extends JpaRepository<Payment,Integer>{
 
 	List<Payment> findByUser(User user);
 
-	@Query("SELECT c FROM Category c JOIN Payment p ON c.id = p.category.id WHERE p.user.id = :userId")
+	
+
+	//@Query("SELECT p.categories FROM Payment p WHERE p.user.userId = :userId")
+	//List<Category> findCategoriesByUserId(Integer userId);
+	@Query("SELECT c FROM Payment p JOIN p.categories c WHERE p.user.id = :userId")
 	List<Category> findCategoriesByUserId(@Param("userId") Integer userId);
+
 
 }

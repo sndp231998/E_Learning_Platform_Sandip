@@ -1,12 +1,17 @@
 package com.e_learning.payloads;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import com.e_learning.entities.Category;
 import com.e_learning.entities.User;
 
 import lombok.Data;
@@ -29,5 +34,9 @@ public class PaymentDto {
 	    
 	   
 	    private UserDto user;
-	    private CategoryDto category;
+	   // private List<CategoryDto> categories; // Change to List of CategoryDto
+	    private List<CategoryDto> categories;
+	    
+	   // private List<Category> categories
+	   
 }

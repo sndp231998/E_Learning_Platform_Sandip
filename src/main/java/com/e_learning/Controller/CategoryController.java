@@ -1,5 +1,6 @@
 package com.e_learning.Controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -128,25 +129,36 @@ public class CategoryController {
           return new ResponseEntity<>(updatedcategory, HttpStatus.OK);
       }
     //-------------method to serve files------------------
-    @GetMapping(value = "/image/{imageName}",produces = MediaType.IMAGE_JPEG_VALUE)
-    public void downloadImage(
-            @PathVariable("imageName") String imageName,
-            HttpServletResponse response
-    ) throws IOException {
-    	String fileExtension = FilenameUtils.getExtension(imageName).toLowerCase();
-        MediaType mediaType = MediaType.IMAGE_JPEG;  // Default
+      @GetMapping(value = "/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+      public void downloadImage(
+              @PathVariable("imageName") String imageName,
+              HttpServletResponse response
+      ) throws IOException {
+          // Log the file name and path
+          String filePath = path + "/" + imageName;
+          System.out.println("Serving image: " + filePath);
 
-        if (fileExtension.equals("png")) {
-            mediaType = MediaType.IMAGE_PNG;
-        } else if (fileExtension.equals("jpg") || fileExtension.equals("jpeg")) {
-            mediaType = MediaType.IMAGE_JPEG;
-        }
+          String fileExtension = FilenameUtils.getExtension(imageName).toLowerCase();
+          MediaType mediaType = MediaType.IMAGE_JPEG;  // Default
 
-        response.setContentType(mediaType.toString());
-        try (InputStream resource = this.fileService.getResource(path, imageName)) {
-            StreamUtils.copy(resource, response.getOutputStream());
-        }
-    }
+          if (fileExtension.equals("png")) {
+              mediaType = MediaType.IMAGE_PNG;
+          } else if (fileExtension.equals("jpg") || fileExtension.equals("jpeg")) {
+              mediaType = MediaType.IMAGE_JPEG;
+          }
+
+          response.setContentType(mediaType.toString());
+          try (InputStream resource = this.fileService.getResource(path, imageName)) {
+              if (resource == null) {
+                  throw new FileNotFoundException("File not found: " + filePath);
+              }
+              StreamUtils.copy(resource, response.getOutputStream());
+          } catch (Exception e) {
+              e.printStackTrace();  // Log the exception
+              response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error serving the image");
+          }
+      }
+
 //        InputStream resource = this.fileService.getResource(path, imageName);
 //        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
 //        StreamUtils.copy(resource,response.getOutputStream())   ;
