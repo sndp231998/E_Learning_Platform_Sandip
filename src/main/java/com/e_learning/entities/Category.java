@@ -32,7 +32,8 @@ public class Category {
 	@Column(name="title", length = 100, nullable = false)
 	private String categoryTitle;
 	
-	@Column(name="description")
+	
+	@Column(name="description",length=1000)
 	private String categoryDescription;
 	
 	private String mainCategory;
