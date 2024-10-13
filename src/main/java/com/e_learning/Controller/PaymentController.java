@@ -23,7 +23,7 @@ import com.e_learning.services.FileService;
 import com.e_learning.services.PaymentService;
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/payment")
 public class PaymentController {
 
 	@Autowired
@@ -36,7 +36,7 @@ public class PaymentController {
 	private String path;
 	
 	//create Payment
-	@PostMapping("/user/{userId}/payments")
+	@PostMapping("/user/{userId}")
 	public ResponseEntity<PaymentDto> createPayment(
 	        @RequestBody PaymentRequest paymentRequest, 
 	        @PathVariable Integer userId) {
@@ -64,5 +64,11 @@ public class PaymentController {
 		public ResponseEntity<List<PaymentDto>> getPayments() {
 			List<PaymentDto> payments = this.paymentService.getAllPayments();
 			return ResponseEntity.ok(payments);
+		}
+		
+		@GetMapping("/check/user/{userId}/category/{categoryId}")
+		public ResponseEntity<Boolean> checkIfCategoryPayment(@PathVariable Integer userId, @PathVariable Integer categoryId) {
+		    boolean isBooked = paymentService.isCategoryPaymentByUser(userId, categoryId);
+		    return ResponseEntity.ok(isBooked);
 		}
 }

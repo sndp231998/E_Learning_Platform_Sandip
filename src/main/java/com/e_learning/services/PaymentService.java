@@ -15,4 +15,6 @@ public interface PaymentService {
 	//List<PaymentDto>getPaymentsByFaculty(Integer userId);
 	
 	List<PaymentDto> getAllPayments();
+	
+	 boolean isCategoryPaymentByUser(Integer userId, Integer categoryId);
 }
