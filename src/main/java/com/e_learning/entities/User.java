@@ -56,6 +56,11 @@ public class User implements UserDetails {
     private String collegename;
     private String faculty;
     
+    @ElementCollection
+    @CollectionTable(name = "user_faculty", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "faculty")
+    private List<String> facult;
+    
     private LocalDateTime subscriptionValidDate;
     private LocalDateTime date_Of_Role_Changed;
     private LocalDateTime lastNotificationDate;

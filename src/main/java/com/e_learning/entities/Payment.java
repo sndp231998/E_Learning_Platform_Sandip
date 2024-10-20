@@ -45,37 +45,4 @@ public class Payment {
     private User user;
 }
 
-//@Entity
-//@Data
-//@NoArgsConstructor
-//public class Payment {
-//
-//	    @Id
-//	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//	    private Integer paymentId;
-//	    
-//	    private Integer totalPrice;
-//	    
-//	    private  LocalDateTime addedDate;
-//	    
-//	    private  String validDate;
-//	    
-//	    private String payment_screensort;
-//	    
-//
-//	    
-//	    @ManyToMany
-//	    @JoinTable(
-//	        name = "payment_category",
-//	        joinColumns = @JoinColumn(name = "payment_id"),
-//	        inverseJoinColumns = @JoinColumn(name = "category_id")
-//	    )
-//	    private List<Category> categories; 
-//
-//	  @ManyToOne
-//	  @JoinColumn(name = "user_id") // Specify the foreign key column for the User entity
-//	    private User user;
-//	
-//	   
-//	    
-//}
+

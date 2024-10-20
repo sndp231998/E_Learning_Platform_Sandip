@@ -394,6 +394,17 @@ private OtpRequestService sendmsg;
         User updatedUser = this.userRepo.save(user);
         return this.userToDto(updatedUser);
     }
+    
+    //---------------update-Facult-------------------
+    @Override
+    public UserDto updateFacult(UserDto userDto,Integer userId) {
+    	 User user = this.userRepo.findById(userId)
+                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+         user.setFacult(userDto.getFacult());
+         logger.info("Faculty from service "+userDto.getFacult());
+         User updatedUser = this.userRepo.save(user);
+         return this.userToDto(updatedUser);
+    }
     //----------update discount only-------------
     @Override
     public UserDto updateDiscount(UserDto userDto, Integer userId) {

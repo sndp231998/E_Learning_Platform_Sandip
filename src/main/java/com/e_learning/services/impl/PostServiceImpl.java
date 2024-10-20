@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.modelmapper.ModelMapper;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,8 @@ import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.PostService;
 import com.e_learning.services.UserService;
 
+import ch.qos.logback.classic.Logger;
+
 
 
 @Service
@@ -50,7 +53,7 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private CategoryRepo categoryRepo;
       
-        
+    org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
     @Override
     public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId) {
 
@@ -198,12 +201,37 @@ public class PostServiceImpl implements PostService {
         return postDtos;
 
 	}
+	@Override
+	public List<PostDto> getPostssByUserFacult(Integer userId) {
+		 User user = this.userRepo.findById(userId)
+	                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+	        
+	        // Get the user's faculty
+	       List<String> userFacult = user.getFacult();
+	       logger.info("userFacult are"+userFacult);
+	       // Find the category that matches the user's faculty
+	        Category category = this.categoryRepo.findByCategoryTitlee(userFacult);
+	        if (category == null) {
+	            throw new ResourceNotFoundException("Category", "title", userFacult);
+	        }
+
+	     // Fetch posts associated with the category
+	        List<Post> posts = this.postRepo.findByCategory(category);
+	     // Convert posts to PostDto
+	        List<PostDto> postDtos = posts.stream()
+	                                      .map(post -> this.modelMapper.map(post, PostDto.class))
+	                                      .collect(Collectors.toList());
+
+	        return postDtos;
+	}
 	
 	@Override
     public List<PostDto> getPostsByCategoryId(Integer categoryId) {
         List<Post> posts = postRepo.findByCategoryCategoryId(categoryId);
         return posts.stream().map(post -> modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
     }
+
+	
 }
  
     

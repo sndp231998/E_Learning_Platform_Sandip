@@ -14,6 +14,10 @@ public interface CategoryRepo extends JpaRepository<Category, Integer> {
 
 	@Query("SELECT c FROM Category c WHERE c.categoryTitle = :categoryTitle")
 	Category findByCategoryTitle(@Param("categoryTitle") String categoryTitle);
+	
+	@Query("SELECT c FROM Category c WHERE c.categoryTitle = :categoryTitle")
+	Category findByCategoryTitlee(@Param("categoryTitle") List<String> categoryTitle);//List<String> userFacult userFacult
+	
 
 	List<Category> findAllByOrderByAddedDateDesc();
 	
