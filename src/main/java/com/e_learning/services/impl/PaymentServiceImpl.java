@@ -2,6 +2,7 @@ package com.e_learning.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import java.util.stream.Collectors;
@@ -45,6 +46,17 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IllegalArgumentException("Category IDs cannot be null or empty.");
         }
 
+        System.out.println("categoryIds: " + categoryIds);
+        System.out.println("paymentDto: " + paymentDto);
+
+        
+        
+        // Ensure categoryIds are properly handled as a list even if it's a single element
+        if (categoryIds.size() == 1) {
+            categoryIds = Collections.singletonList(categoryIds.get(0));
+        }
+        
+    
         List<Category> categories = categoryRepo.findAllById(categoryIds);
 
         if (categories.isEmpty()) {

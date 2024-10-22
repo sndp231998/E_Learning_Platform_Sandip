@@ -202,28 +202,59 @@ public class PostServiceImpl implements PostService {
 
 	}
 	@Override
-	public List<PostDto> getPostssByUserFacult(Integer userId) {
-		 User user = this.userRepo.findById(userId)
-	                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-	        
-	        // Get the user's faculty
-	       List<String> userFacult = user.getFacult();
-	       logger.info("userFacult are"+userFacult);
-	       // Find the category that matches the user's faculty
-	        Category category = this.categoryRepo.findByCategoryTitlee(userFacult);
-	        if (category == null) {
-	            throw new ResourceNotFoundException("Category", "title", userFacult);
-	        }
+	public List<PostDto> getPostssByUserFacult(Integer userId, String faculty) {
+	    // Retrieve user by ID
+	    User user = this.userRepo.findById(userId)
+	            .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+	    
+	    // Get the user's faculties (multiple faculties)
+	    List<String> userFacult = user.getFacult();
+	    
+	    // Check if the provided faculty exists in the user's faculty list
+	    if (!userFacult.contains(faculty)) {
+	        throw new ResourceNotFoundException("Faculty", "faculty", faculty);
+	    }
 
-	     // Fetch posts associated with the category
-	        List<Post> posts = this.postRepo.findByCategory(category);
-	     // Convert posts to PostDto
-	        List<PostDto> postDtos = posts.stream()
-	                                      .map(post -> this.modelMapper.map(post, PostDto.class))
-	                                      .collect(Collectors.toList());
+	    // Find the category that matches the provided faculty
+	    Category category = this.categoryRepo.findByCategoryTitle(faculty);
+	    if (category == null) {
+	        throw new ResourceNotFoundException("Category", "title", faculty);
+	    }
 
-	        return postDtos;
+	    // Fetch posts associated with the category
+	    List<Post> posts = this.postRepo.findByCategory(category);
+	    
+	    // Convert posts to PostDto
+	    List<PostDto> postDtos = posts.stream()
+	                                  .map(post -> this.modelMapper.map(post, PostDto.class))
+	                                  .collect(Collectors.toList());
+
+	    return postDtos;
 	}
+
+//	@Override
+//	public List<PostDto> getPostssByUserFacult(Integer userId) {
+//		 User user = this.userRepo.findById(userId)
+//	                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+//	        
+//	        // Get the user's faculty
+//	       List<String> userFacult = user.getFacult();
+//	       logger.info("userFacult are"+userFacult);
+//	       // Find the category that matches the user's faculty
+//	        Category category = this.categoryRepo.findByCategoryTitlee(userFacult);
+//	        if (category == null) {
+//	            throw new ResourceNotFoundException("Category", "title", userFacult);
+//	        }
+//
+//	     // Fetch posts associated with the category
+//	        List<Post> posts = this.postRepo.findByCategory(category);
+//	     // Convert posts to PostDto
+//	        List<PostDto> postDtos = posts.stream()
+//	                                      .map(post -> this.modelMapper.map(post, PostDto.class))
+//	                                      .collect(Collectors.toList());
+//
+//	        return postDtos;
+//	}
 	
 	@Override
     public List<PostDto> getPostsByCategoryId(Integer categoryId) {

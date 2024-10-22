@@ -44,7 +44,8 @@ public interface PostService {
 		
 		List<PostDto>getPostsByUserFaculty(Integer userId);
 		
-		List<PostDto>getPostssByUserFacult(Integer userId);
+	//	List<PostDto>getPostssByUserFacult(Integer userId);
+		List<PostDto>getPostssByUserFacult(Integer userId, String faculty) ;
 		//search posts
 		List<PostDto> searchPosts(String keyword);
 		
