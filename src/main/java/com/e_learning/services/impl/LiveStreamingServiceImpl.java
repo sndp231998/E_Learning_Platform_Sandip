@@ -71,6 +71,7 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
         return liveDtos;
     }
 
+    
     @Override
     public List<LiveStreamingDto> getLiveStreamingsByUserFaculty(Integer userId) {
         // Retrieve user by ID
@@ -141,6 +142,47 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
 
         this.liveRepo.delete(live);
 		
+	}
+//	@Override
+//	public List<PostDto> getPostssByUserFacult(Integer userId, String faculty) {
+//	    // Retrieve user by ID
+
+	
+	
+
+//
+
+//	    return postDtos;
+//	}
+
+
+	@Override
+	public List<LiveStreamingDto> getLiveStreamingByUserFaculty(Integer userId, String faculty) {
+	    User user = this.userRepo.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+//// Get the user's faculties (multiple faculties)
+List<String> userFacult = user.getFacult();
+//
+// Check if the provided faculty exists in the user's faculty list
+if (!userFacult.contains(faculty)) {
+   throw new ResourceNotFoundException("Faculty", "faculty", faculty);
+}
+
+//// Find the category that matches the provided faculty
+Category category = this.categoryRepo.findByCategoryTitle(faculty);
+if (category == null) {
+   throw new ResourceNotFoundException("Category", "title", faculty);
+}
+//// Fetch posts associated with the category
+List<LiveStreaming> lives = this.liveRepo.findByCategory(category);
+//
+//// Convert lives to liveDto
+  List<LiveStreamingDto> liveDtos = lives.stream()
+                              .map(live -> this.modelMapper.map(live, LiveStreamingDto.class))
+                             .collect(Collectors.toList());
+
+		return liveDtos;
 	}
 
 

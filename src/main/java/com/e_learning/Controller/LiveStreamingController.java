@@ -87,4 +87,12 @@ public class LiveStreamingController {
 			return new ResponseEntity<LiveStreamingDto>(updatelive, HttpStatus.OK);
 
 		}
+//		get Posts By userFaculty
+		@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
+		@GetMapping("lives/user/{userId}/faculty/{faculty}")
+		public ResponseEntity<List<LiveStreamingDto>> getLiveStreamingByUserFaculty(@PathVariable Integer userId, @PathVariable String faculty) {
+		    List<LiveStreamingDto> lives = this.liveService.getLiveStreamingByUserFaculty(userId, faculty);
+		    		
+		    return new ResponseEntity<>(lives, HttpStatus.OK);
+		}
 }

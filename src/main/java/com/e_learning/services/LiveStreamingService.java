@@ -20,6 +20,8 @@ public interface LiveStreamingService {
 			
 			List<LiveStreamingDto>getLiveStreamingsByUserFaculty(Integer userId);
 			
+			List<LiveStreamingDto>getLiveStreamingByUserFaculty(Integer userId,String faculty);
+			
 			List<LiveStreamingDto> getAllLives();
 			
 
