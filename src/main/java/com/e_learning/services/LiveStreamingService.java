@@ -21,4 +21,16 @@ public interface LiveStreamingService {
 			List<LiveStreamingDto>getLiveStreamingsByUserFaculty(Integer userId);
 			
 			List<LiveStreamingDto> getAllLives();
+			
+
+			//update 
+
+			LiveStreamingDto updateLiveStreaming(LiveStreamingDto liveDto, Integer liveId);
+
+			// delete
+			
+			void deleteLiveStreaming(Integer liveId);
+			
+
+			
 }

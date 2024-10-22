@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.e_learning.payloads.AnswerDto;
 import com.e_learning.payloads.ExamDto;
+import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.UserDto;
 
 
@@ -22,5 +23,5 @@ public interface AnswerService {
 	
 	//List<AnswerDto> findByExamCategory(String categoryTitle);
 	
-	
+	List<AnswerDto> getAnswersByExam(Integer examId);
 }

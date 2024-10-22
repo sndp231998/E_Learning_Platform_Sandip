@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,17 +37,20 @@ public class Category {
 	@Column(name="description",length=1000)
 	private String categoryDescription;
 	
+	//@NotBlank(message = "mainis required")
 	private String mainCategory;
 	
 	 private LocalDateTime courseValidDate;
 	 
 	 private LocalDateTime addedDate;
 
+	 @NotBlank(message = "subject price is required")
 	private String price;
 	
 	private String imageName;
 	
-	private String courseType;
+	@NotBlank(message = "cource type  is required")
+	private String categoryType;
 	
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Post> posts = new ArrayList<>();

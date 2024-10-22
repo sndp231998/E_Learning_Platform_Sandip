@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Category;
 import com.e_learning.entities.LiveStreaming;
+import com.e_learning.entities.Post;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.LiveStreamingDto;
+import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.UserDto;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.LiveStreamingRepo;
@@ -59,7 +61,9 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
 
         List<LiveStreaming> lives = this.liveRepo.findByCategory(category);
-
+ if(lives.isEmpty()) {
+	 throw new ResourceNotFoundException("live streaming","category id",categoryId);
+ }
         List<LiveStreamingDto> liveDtos = lives.stream()
                 .map(live -> this.modelMapper.map(live, LiveStreamingDto.class))
                 .collect(Collectors.toList());
@@ -106,6 +110,38 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
                     .map(this::LiveStreamingToDto) // Ensure this method returns LiveStreamingDto
                     .collect(Collectors.toList());
     }
+
+    @Override
+    public LiveStreamingDto updateLiveStreaming(LiveStreamingDto liveDto, Integer liveId) {
+        // Check if liveId exists
+        LiveStreaming live = this.liveRepo.findById(liveId)
+                .orElseThrow(() -> new ResourceNotFoundException("live ", "live id", liveId));
+        
+        // Set fields from the DTO to the entity
+        live.setStartingTime(liveDto.getStartingTime());
+        live.setStreamlink(liveDto.getStreamlink());
+        live.setTitle(liveDto.getTitle());
+
+        // Check if category is provided before setting it
+        if (liveDto.getCategory() != null && liveDto.getCategory().getCategoryId() != null) {
+            Category category = this.categoryRepo.findById(liveDto.getCategory().getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", liveDto.getCategory().getCategoryId()));
+            live.setCategory(category);
+        }
+
+        // Save the updated entity
+        LiveStreaming updatedLive = this.liveRepo.save(live);
+        return this.modelMapper.map(updatedLive, LiveStreamingDto.class);
+    }
+
+	@Override
+	public void deleteLiveStreaming(Integer liveId) {
+		LiveStreaming live = this.liveRepo.findById(liveId)
+                .orElseThrow(() -> new ResourceNotFoundException("Liv ", "live id", liveId));
+
+        this.liveRepo.delete(live);
+		
+	}
 
 
 }

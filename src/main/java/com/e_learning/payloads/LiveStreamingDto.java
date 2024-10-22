@@ -18,7 +18,7 @@ public class LiveStreamingDto {
 
 	  @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer Liveid;
+	private Integer liveId;
 	
 	  private String title;
 	

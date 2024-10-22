@@ -58,23 +58,48 @@ public class ExamServiceImpl implements ExamService{
 	    
 
 	}
-
+	
 	@Override
 	public ExamDto updateExam(ExamDto examDto, Integer examId) {
-		Exam exam = this.examRepo.findById(examId)
-                .orElseThrow(() -> new ResourceNotFoundException("Examt ", "exam id", examId));
+	    Exam exam = this.examRepo.findById(examId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Exam", "exam id", examId));
 
-        Category category = this.categoryRepo.findById(examDto.getCategory().getCategoryId()).get();
+	    // Check if the category exists in the examDto
+	    if (examDto.getCategory() != null && examDto.getCategory().getCategoryId() != null) {
+	        // Fetch category if it is present
+	        Category category = this.categoryRepo.findById(examDto.getCategory().getCategoryId())
+	                .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", examDto.getCategory().getCategoryId()));
 
-        exam.setTitle(examDto.getTitle());
-        exam.setDeadline(examDto.getDeadline());
-        exam.setImageName(examDto.getImageName());
-        exam.setCategory(category);
+	        exam.setCategory(category); // Set the category if found
+	    }
+
+	    // Update other fields of the exam
+	    exam.setTitle(examDto.getTitle());
+	    exam.setDeadline(examDto.getDeadline());
+	    exam.setImageName(examDto.getImageName());
+
+	    // Save the updated exam
+	    Exam updatedExam = this.examRepo.save(exam);
+	    return this.modelMapper.map(updatedExam, ExamDto.class);
+	}
 
 
-        Exam updatedexam = this.examRepo.save(exam);
-        return this.modelMapper.map(updatedexam, ExamDto.class);
-    }
+//	@Override
+//	public ExamDto updateExam(ExamDto examDto, Integer examId) {
+//		Exam exam = this.examRepo.findById(examId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Examt ", "exam id", examId));
+//
+//        Category category = this.categoryRepo.findById(examDto.getCategory().getCategoryId()).get();
+//
+//        exam.setTitle(examDto.getTitle());
+//        exam.setDeadline(examDto.getDeadline());
+//        exam.setImageName(examDto.getImageName());
+//        exam.setCategory(category);
+//
+//
+//        Exam updatedexam = this.examRepo.save(exam);
+//        return this.modelMapper.map(updatedexam, ExamDto.class);
+//    }
 
 	
 
@@ -102,6 +127,10 @@ public class ExamServiceImpl implements ExamService{
 	                .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
 	        List<Exam> exams = this.examRepo.findByCategory(cat);
 	        		
+	        // If no exams are found, you can handle it here
+	        if (exams.isEmpty()) {
+	            throw new ResourceNotFoundException("No exams", "category id", categoryId);
+	        }
 
 	        List<ExamDto> examDtos = exams.stream().map((exam) -> this.modelMapper.map(exam, ExamDto.class))
 	                .collect(Collectors.toList());

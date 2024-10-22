@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 @Entity
@@ -27,6 +29,7 @@ public class Exam {
 	    
 	    private LocalDateTime addedDate;
 	    
+	    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 	    private String  deadline;
 	    
 	    @ManyToOne

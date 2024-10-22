@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +30,7 @@ import com.e_learning.entities.User;
 import com.e_learning.payloads.AnswerDto;
 import com.e_learning.payloads.ApiResponse;
 import com.e_learning.payloads.ExamDto;
+import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.UserDto;
 import com.e_learning.services.AnswerService;
 import com.e_learning.services.FileService;
@@ -130,6 +132,14 @@ public class AnswerController {
         StreamUtils.copy(resource, response.getOutputStream());
     }
     
-    
+ // get by exam
+ 	@PreAuthorize("hasRole('ADMIN')")
+ 	@GetMapping("/exam/{examId}/answers")
+ 	public ResponseEntity<List<AnswerDto>> getAnswersByCategory(@PathVariable Integer examId) {
+
+ 		List<AnswerDto> answers = this.answerService.getAnswersByExam(examId);
+ 		return new ResponseEntity<List<AnswerDto>>(answers, HttpStatus.OK);
+
+ 	}
   
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ import com.e_learning.services.CategoryService;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
+	 private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+	   
 	@Autowired
 	private CategoryRepo categoryRepo;
 
@@ -39,7 +43,9 @@ public class CategoryServiceImpl implements CategoryService {
 		cat.setMainCategory(categoryDto.getMainCategory());
 		cat.setAddedDate(LocalDateTime.now());
 		cat.setImageName("");
-		cat.setCourseType(categoryDto.getCourseType());
+		cat.setCategoryType(categoryDto.getCategoryType());
+		
+		logger.info("Category type..... "+categoryDto.getCategoryType());
 		cat.setCourseValidDate(categoryDto.getCourseValidDate());
 		Category addedCat = this.categoryRepo.save(cat);
 		return this.modelMapper.map(addedCat, CategoryDto.class);
@@ -50,11 +56,14 @@ public class CategoryServiceImpl implements CategoryService {
 
 		Category cat = this.categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category ", "Category Id", categoryId));
-
+         
 		cat.setCategoryTitle(categoryDto.getCategoryTitle());
 		cat.setCategoryDescription(categoryDto.getCategoryDescription());
          cat.setPrice(categoryDto.getPrice());
          cat.setAddedDate(LocalDateTime.now());
+         
+         cat.setCategoryType(categoryDto.getCategoryType());
+         logger.info("Category type..... "+categoryDto.getCategoryType());
          cat.setImageName(categoryDto.getImageName());
          cat.setMainCategory(categoryDto.getMainCategory());
 		Category updatedcat = this.categoryRepo.save(cat);

@@ -9,10 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Answer;
+import com.e_learning.entities.Category;
 import com.e_learning.entities.Exam;
+import com.e_learning.entities.Post;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.AnswerDto;
+import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.UserDto;
 import com.e_learning.repositories.AnswerRepo;
 import com.e_learning.repositories.ExamRepo;
@@ -88,11 +91,20 @@ public class AnswerServiceImpl implements AnswerService {
         return this.modelMapper.map(answer, AnswerDto.class);
     }
 
-//
-//    private UserDto convertToUserDto(User user) {
-//        return modelMapper.map(user, UserDto.class);
-//    }
-//    
+    @Override
+    public List<AnswerDto> getAnswersByExam(Integer examId) {
 
+        Exam exam = this.examRepo.findById(examId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exam", "exam id", examId));
+        List<Answer> answers = this.answerRepo.findByExam(exam);
+
+        if(answers.isEmpty()) {
+        	throw new ResourceNotFoundException("No exam","exam id",examId);
+        }
+        List<AnswerDto> answerDtos = answers.stream().map((answer) -> this.modelMapper.map(answer, AnswerDto.class))
+                .collect(Collectors.toList());
+
+        return answerDtos;
+    }
 
 }

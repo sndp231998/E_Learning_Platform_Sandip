@@ -11,12 +11,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.e_learning.entities.User;
 import com.e_learning.payloads.LiveStreamingDto;
+import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.UserDto;
 import com.e_learning.services.LiveStreamingService;
 import com.e_learning.services.impl.RateLimitingService;
@@ -73,5 +75,16 @@ public class LiveStreamingController {
 		public ResponseEntity<List<LiveStreamingDto>> getAllLives() {
 			 rateLimitingService.checkRateLimit("test-api-key");
 			return ResponseEntity.ok(this.liveService.getAllLives());
+		}
+		
+		// update post
+		@PreAuthorize("hasRole('ADMIN')")
+		@PutMapping("/lives/{liveId}")
+		public ResponseEntity<LiveStreamingDto> updateLiveStreaming(@RequestBody LiveStreamingDto liveDto, @PathVariable Integer liveId) {
+
+			LiveStreamingDto updatelive = this.liveService.updateLiveStreaming(liveDto, liveId);
+					//updatelive(postDto, postId);
+			return new ResponseEntity<LiveStreamingDto>(updatelive, HttpStatus.OK);
+
 		}
 }
