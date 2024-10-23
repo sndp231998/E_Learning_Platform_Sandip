@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,8 +32,15 @@ public class Payment {
     private Integer totalPrice;
     private LocalDateTime addedDate;
     private String validDate;
-    private String payment_screensort;
+    private String payment_screensort;;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+    
+    public enum PaymentStatus {
+        PENDING, APPROVED, REJECTED
+    }
+    
     @ManyToMany
     @JoinTable(
         name = "payment_category",

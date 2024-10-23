@@ -43,11 +43,11 @@ public class UserDto {
 	 
 	    private String discount;
 
-//	private LocalDateTime SubscriptionValidDate;
-//	
-//	private LocalDateTime date_Of_Role_Changed;
-//	
-//	private LocalDateTime lastNotificationDate;
+	private LocalDateTime SubscriptionValidDate;
+	
+	private LocalDateTime date_Of_Role_Changed;
+	
+	private LocalDateTime lastNotificationDate;
 	
 	private Set<RoleDto> roles = new HashSet<>();
 	
