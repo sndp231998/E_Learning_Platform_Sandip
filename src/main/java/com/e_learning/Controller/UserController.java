@@ -64,7 +64,7 @@ public class UserController {
 	}
 
 	// PUT- update user
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') or hasRole('NORAML')")
 	@PutMapping("/{userId}")
 	public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable("userId") Integer uid) {
 		UserDto updatedUser = this.userService.updateUser(userDto, uid);
@@ -203,4 +203,19 @@ public class UserController {
         List<String> faculties = userService.getFacultiesByUserId(userId);
         return ResponseEntity.ok(faculties);
     }
+    
+    @GetMapping("/recent-7-days")
+    public ResponseEntity<?> getUsersJoinedInLast7Days() {
+        List<UserDto> users = userService.getUsersJoinedInLast7Days();
+        
+        if (users.isEmpty()) {
+            return ResponseEntity.ok("No users joined in the last seven days.");
+        }
+        
+        return ResponseEntity.ok(users);
+    }
+
+
 }
+    
+

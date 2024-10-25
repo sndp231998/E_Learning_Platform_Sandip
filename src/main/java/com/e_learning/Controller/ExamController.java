@@ -31,6 +31,7 @@ import com.e_learning.payloads.ApiResponse;
 
 import com.e_learning.payloads.ExamDto;
 import com.e_learning.payloads.IncomeDto;
+import com.e_learning.payloads.PostDto;
 import com.e_learning.services.ExamService;
 import com.e_learning.services.FileService;
 
@@ -92,6 +93,15 @@ public class ExamController {
 	        return new ResponseEntity<>(exams, HttpStatus.OK);
 	    }
 	
+	//get exams By userFaculty
+	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
+	@GetMapping("exams/user/{userId}/faculty/{faculty}")
+	public ResponseEntity<List<ExamDto>> getExamsByUserFaculty(@PathVariable Integer userId, @PathVariable String faculty) {
+	    List<ExamDto> exams = this.examService.getExamsByUserFaculty(userId, faculty);
+	    		
+	    return new ResponseEntity<>(exams, HttpStatus.OK);
+	}
+
 	// get all Exam
 		@GetMapping("/exams")
 		public ResponseEntity<List<ExamDto>> getExams() {

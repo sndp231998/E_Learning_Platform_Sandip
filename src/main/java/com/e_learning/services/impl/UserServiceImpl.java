@@ -26,6 +26,7 @@ import com.e_learning.entities.Role;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.UserDto;
+import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.OtpRequestRepo;
 import com.e_learning.repositories.PaymentRepo;
 import com.e_learning.repositories.RoleRepo;
@@ -59,6 +60,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private NotificationService notificationService;
 
+    private CategoryRepo categoryRepo;
     @Autowired
 private OtpRequestService sendmsg;
     
@@ -66,6 +68,7 @@ private OtpRequestService sendmsg;
     public UserDto registerNewUser(UserDto userDto) {
         User user = this.modelMapper.map(userDto, User.class);
        user.setImageName("");
+       user.setDateOfRegistration(LocalDateTime.now());
        user.setMobileNo(userDto.getEmail());
      // encoded the password
      		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
@@ -426,6 +429,8 @@ private OtpRequestService sendmsg;
     public List<String> getFacultiesByUserId(int userId) {
     	User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+    	
+    	
         List<String>faculties= userRepo.findFacultiesByUserId(userId);
         if (faculties == null || faculties.isEmpty()) {
             throw new ResourceNotFoundException("Subscribed  cource ","Id",userId);
@@ -435,7 +440,14 @@ private OtpRequestService sendmsg;
 
 
 
-
+    @Override
+    public List<UserDto> getUsersJoinedInLast7Days() {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        List<User> recentUsers = userRepo.findUsersJoinedInLast7Days(sevenDaysAgo);
+        return recentUsers.stream()
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
+    }
 
    
 

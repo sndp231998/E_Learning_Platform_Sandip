@@ -29,7 +29,8 @@ public class UserDto {
 
 
 	private String email;
- 
+	
+	private LocalDateTime dateOfRegistration;
 
 	private String password;
 

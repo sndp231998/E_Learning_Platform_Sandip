@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.e_learning.entities.User;
+import com.e_learning.payloads.ApiResponse;
 import com.e_learning.payloads.LiveStreamingDto;
 import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.UserDto;
@@ -94,5 +96,14 @@ public class LiveStreamingController {
 		    List<LiveStreamingDto> lives = this.liveService.getLiveStreamingByUserFaculty(userId, faculty);
 		    		
 		    return new ResponseEntity<>(lives, HttpStatus.OK);
+		}
+		
+		// delete post
+		@PreAuthorize("hasRole('ADMIN')")
+		@DeleteMapping("/live/{liveId}")
+		public ApiResponse deleteLive(@PathVariable Integer liveId) {
+			this.liveService.deleteLiveStreaming(liveId);
+			
+			return new ApiResponse("LiveStreaming is successfully deleted !!", true);
 		}
 }

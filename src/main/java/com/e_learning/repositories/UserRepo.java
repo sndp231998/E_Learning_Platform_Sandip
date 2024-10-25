@@ -1,5 +1,6 @@
 package com.e_learning.repositories;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +25,7 @@ public interface UserRepo extends JpaRepository<User, Integer>{
 
 @Query("SELECT DISTINCT u.faculty FROM User u")
 List<String> findAllFaculties();
+
+@Query("SELECT u FROM User u WHERE u.dateOfRegistration >= :sevenDaysAgo")
+List<User> findUsersJoinedInLast7Days(LocalDateTime sevenDaysAgo);
 }

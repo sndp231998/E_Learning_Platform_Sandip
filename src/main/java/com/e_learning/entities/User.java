@@ -52,7 +52,9 @@ public class User implements UserDetails {
     private LocalDateTime otpValidUntil;
 
     
-	
+    @Column(name = "date_of_registration")
+    private LocalDateTime dateOfRegistration;
+
 	
 	private String imageName;
     private String collegename;

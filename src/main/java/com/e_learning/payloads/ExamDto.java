@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.e_learning.entities.Category;
+import com.e_learning.entities.Exam.ExamType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,9 +28,13 @@ public class ExamDto {
   
   private LocalDateTime addedDate;
   
-  private String  deadline;
+  private LocalDateTime deadline;
+  private LocalDateTime startTime;
+  private LocalDateTime endTime;
   
 	private CategoryDto category;
 
+	private ExamType examType;
+	
 	//private UserDto user;
 }

@@ -40,5 +40,6 @@ public interface ExamService {
 			
 			List<ExamDto>getExamsByUserFaculty(Integer userId);
 			
+			List<ExamDto>getExamsByUserFaculty(Integer userId, String faculty) ;
 			List<ExamDto> searchExams(String keyword);
 }

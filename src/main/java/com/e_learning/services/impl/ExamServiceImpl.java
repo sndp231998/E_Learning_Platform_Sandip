@@ -11,12 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Category;
 import com.e_learning.entities.Exam;
-
+import com.e_learning.entities.Post;
+import com.e_learning.entities.Exam.ExamType;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 
 import com.e_learning.payloads.ExamDto;
-
+import com.e_learning.payloads.PostDto;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.ExamRepo;
 
@@ -37,27 +38,46 @@ public class ExamServiceImpl implements ExamService{
 	    private CategoryRepo categoryRepo;
 	      
 	        
-	@Override
-	public ExamDto createExam(ExamDto examDto, Integer userId, Integer categoryId) {
-		  User user = this.userRepo.findById(userId)
-	                .orElseThrow(() -> new ResourceNotFoundException("User ", "User id", userId));
+	    @Override
+	    public ExamDto createExam(ExamDto examDto, Integer userId, Integer categoryId) {
+	        User user = this.userRepo.findById(userId)
+	                .orElseThrow(() -> new ResourceNotFoundException("User", "User id", userId));
 
 	        Category category = this.categoryRepo.findById(categoryId)
-	                .orElseThrow(() -> new ResourceNotFoundException("Category", "category id ", categoryId));
+	                .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
 
 	        Exam exam = this.modelMapper.map(examDto, Exam.class);
 	        exam.setImageName("");
-	        
-	        exam.setAddedDate(LocalDateTime.now()); 
+	        exam.setAddedDate(LocalDateTime.now());
 	        exam.setUser(user);
 	        exam.setCategory(category);
 
-	        Exam newexam = this.examRepo.save(exam);
+	        // Check examType using enum comparison
+	        if (examDto.getExamType() == ExamType.ASSIGNMENT) {
+	        	if(examDto.getDeadline()==null) {
+	        		throw new IllegalArgumentException("DeadLine is required  for Assignment Exam type");
+	        	}
+	            exam.setDeadline(examDto.getDeadline());
+	            exam.setStartTime(null);
+	            exam.setEndTime(null);
+	        } else if (examDto.getExamType() == ExamType.EXAM || examDto.getExamType() == ExamType.TEST) {
+	           if(examDto.getStartTime()==null ||examDto.getEndTime()==null) {
+	         throw new IllegalArgumentException("Starting time and endTime are required for EXAM/TEST exam type");
+	           
+	           }
+	        	exam.setStartTime(examDto.getStartTime());
+	            exam.setEndTime(examDto.getEndTime());
+	            exam.setDeadline(null);
+	        } else {
+	            throw new IllegalArgumentException("Invalid exam type. It must be either ASSIGNMENT, EXAM, or TEST.");
+	        }
 
-	        return this.modelMapper.map(newexam, ExamDto.class);
-	    
+	        Exam newExam = this.examRepo.save(exam);
 
-	}
+	        return this.modelMapper.map(newExam, ExamDto.class);
+	    }
+
+
 	
 	@Override
 	public ExamDto updateExam(ExamDto examDto, Integer examId) {
@@ -190,6 +210,44 @@ public class ExamServiceImpl implements ExamService{
 				.collect(Collectors.toList());
 
 		return examDtos;
+	}
+
+//	@Override
+//	public List<PostDto> getPostssByUserFacult(Integer userId, String faculty) {
+   
+
+//
+
+//	    
+
+//	}
+
+	@Override
+	public List<ExamDto> getExamsByUserFaculty(Integer userId, String faculty) {
+		//get user id
+		User user = this.userRepo.findById(userId)
+	            .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+//	    
+//	    // Get the user's faculties (multiple faculties)
+	    List<String> userFacult = user.getFacult();
+//	    
+//	    // Check if the provided faculty exists in the user's faculty list
+	    if (!userFacult.contains(faculty)) {
+        throw new ResourceNotFoundException("Faculty", "faculty", faculty);
+	    }
+//	    // Find the category that matches the provided faculty
+	    Category category = this.categoryRepo.findByCategoryTitle(faculty);
+	    if (category == null) {
+	        throw new ResourceNotFoundException("Category", "title", faculty);
+	    }
+	    // Fetch posts associated with the category
+	    List<Exam> exams = this.examRepo.findByCategory(category);
+//	    // Convert exams to ExamDto
+	    List<ExamDto> examDtos = exams.stream()
+	                                  .map(exam -> this.modelMapper.map(exam, ExamDto.class))
+	                                  .collect(Collectors.toList());
+//
+	    return examDtos;
 	}
 
 }

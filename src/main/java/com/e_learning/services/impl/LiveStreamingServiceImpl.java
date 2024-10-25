@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Category;
+import com.e_learning.entities.Exam;
 import com.e_learning.entities.LiveStreaming;
 import com.e_learning.entities.Post;
 import com.e_learning.entities.User;

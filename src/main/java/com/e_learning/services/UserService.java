@@ -51,4 +51,6 @@ UserDto registerNewUser(UserDto user);
     //------discount--------------
    //UserDto updateDiscount(Integer userId,String discount);
     UserDto updateDiscount(UserDto user, Integer userId);
+    
+    List<UserDto> getUsersJoinedInLast7Days();
 }
