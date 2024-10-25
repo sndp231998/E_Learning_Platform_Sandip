@@ -46,6 +46,8 @@ UserDto registerNewUser(UserDto user);
     
     UserDto updateFaculty(UserDto user, Integer userId);
     UserDto updateFacult(UserDto user,Integer userID);
+    
+    List<String> getFacultiesByUserId(int userId);
     //------discount--------------
    //UserDto updateDiscount(Integer userId,String discount);
     UserDto updateDiscount(UserDto user, Integer userId);

@@ -198,4 +198,9 @@ public class UserController {
 //
 //    }
 
+    @GetMapping("/{userId}/faculties")
+    public ResponseEntity<List<String>> getFacultiesByUserId(@PathVariable int userId) {
+        List<String> faculties = userService.getFacultiesByUserId(userId);
+        return ResponseEntity.ok(faculties);
+    }
 }

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -421,6 +422,22 @@ private OtpRequestService sendmsg;
 
 
 
+    @Override
+    public List<String> getFacultiesByUserId(int userId) {
+    	User user = this.userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+        List<String>faculties= userRepo.findFacultiesByUserId(userId);
+        if (faculties == null || faculties.isEmpty()) {
+            throw new ResourceNotFoundException("Subscribed  cource ","Id",userId);
+        }
+        return faculties;
+    }
+
+
+
+
+
+   
 
     
         

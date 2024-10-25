@@ -38,6 +38,23 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private ModelMapper modelMapper;
 
+    
+    
+ 
+    public void updateTotalPrice(Payment payment) {
+        if (payment.getCategories() != null && !payment.getCategories().isEmpty()) {
+            // Calculate the total price based on selected categories
+            Integer total = payment.getCategories().stream()
+                    .mapToInt(category -> Integer.parseInt(category.getPrice())) // Ensure this returns an integer
+                    .sum();
+            
+            // Update the total and totalPrice in the payment entity
+           
+            payment.setTotal(total);
+            payment.setTotalPrice(total); // Assuming both total and totalPrice should be the same
+        }
+    }  
+    
     @Override
     public PaymentDto createPayment(PaymentDto paymentDto, Integer userId, List<Integer> categoryIds) {
         User user = userRepo.findById(userId)
@@ -92,6 +109,8 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setCategories(categories);
         payment.setStatus(PaymentStatus.PENDING);//set the status to panding
 
+        
+        updateTotalPrice(payment);
         Payment newPayment = paymentRepo.save(payment);
         return modelMapper.map(newPayment, PaymentDto.class);
         
@@ -205,7 +224,10 @@ public class PaymentServiceImpl implements PaymentService {
 
 
 
+    
 
+
+    
 
     // Add the category names/IDs to the user's facult list
 //  List<String> categoryNames = categories.stream()

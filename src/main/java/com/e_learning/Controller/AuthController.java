@@ -67,6 +67,13 @@ public class AuthController {
 	 @Autowired
 	 private CustomUserDetailService customUserDetailService;
 
+	 
+	 @GetMapping("/chat")
+	    public String showChatPage() {
+	        return "forward:/index.html"; // This will render chat.html from the resources/statics folder
+	    }
+	 
+	 
 	 @PostMapping("/login")
 		public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request) throws Exception {
 			this.authenticate(request.getUsername(), request.getPassword());
@@ -151,6 +158,6 @@ public class AuthController {
         }
     }
 
-
+   
 	 
 }

@@ -42,8 +42,14 @@ public class SecurityConfig {
 	            "/swagger-ui/**", 
 	            "/webjars/**",
 	            "/api/v1/auth/login/",
-	            "api/v1/users/"    
-//	            "/api/v1/auth/**", 
+	            "api/v1/users/" ,
+	            "/app/message/",//to send message
+	            "/index.html",
+	            "/static/**",
+	           "/server1",//to connect with server
+	           "/topic/return-to", //to subscribe so that we can recive message
+//	           
+	           "/api/v1/auth/**", 
 //	            "/v3/api-docs",
 //	            "/v2/api-docs",
 //	            "/swagger-resources/**",

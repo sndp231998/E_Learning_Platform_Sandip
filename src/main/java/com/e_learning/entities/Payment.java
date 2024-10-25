@@ -29,6 +29,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer paymentId;
 
+    private Integer total;
     private Integer totalPrice;
     private LocalDateTime addedDate;
     private String validDate;
