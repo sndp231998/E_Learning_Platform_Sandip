@@ -1,5 +1,6 @@
 package com.e_learning.repositories;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,12 @@ import com.e_learning.entities.User;
 
 public interface PaymentRepo extends JpaRepository<Payment,Integer>{
 
+	@Query("SELECT p FROM Payment p WHERE p.user.id = :userId AND p.addedDate >= :within24Hours")
+	List<Payment> findPaymentsByUserIdWithin24Hours(Integer userId, LocalDateTime within24Hours);
+
+	
+	@Query("SELECT p FROM Payment p WHERE p.user.id = :userId ORDER BY p.addedDate DESC")
+	Payment findLastPaymentByUserId(Integer userId);
 	
 	// Fetch payments by user
     List<Payment> findByUser(User user);

@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -15,12 +16,14 @@ import org.springframework.stereotype.Service;
 import com.e_learning.entities.Category;
 import com.e_learning.entities.Payment;
 import com.e_learning.entities.Payment.PaymentStatus;
+import com.e_learning.entities.Role;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 
 import com.e_learning.payloads.PaymentDto;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.PaymentRepo;
+import com.e_learning.repositories.RoleRepo;
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.PaymentService;
 @Service
@@ -38,7 +41,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private ModelMapper modelMapper;
 
-    
+    private RoleRepo roleRepo;
     
  
     public void updateTotalPrice(Payment payment) {
@@ -54,7 +57,6 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setTotalPrice(total); // Assuming both total and totalPrice should be the same
         }
     }  
-    
     @Override
     public PaymentDto createPayment(PaymentDto paymentDto, Integer userId, List<Integer> categoryIds) {
         User user = userRepo.findById(userId)
@@ -64,17 +66,11 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IllegalArgumentException("Category IDs cannot be null or empty.");
         }
 
-//        System.out.println("categoryIds: " + categoryIds);
-//        System.out.println("paymentDto: " + paymentDto);
-
-        
-        
         // Ensure categoryIds are properly handled as a list even if it's a single element
         if (categoryIds.size() == 1) {
             categoryIds = Collections.singletonList(categoryIds.get(0));
         }
-        
-    
+
         List<Category> categories = categoryRepo.findAllById(categoryIds);
 
         if (categories.isEmpty()) {
@@ -100,6 +96,13 @@ public class PaymentServiceImpl implements PaymentService {
                 .mapToInt(category -> Integer.parseInt(category.getPrice()))
                 .sum();
 
+        // Apply discount based on the number of categories selected
+        if (categoryIds.size() == 2) {
+            totalPrice *= 0.10;  // 10% discount for 2 categories
+        } else if (categoryIds.size() >= 3) {
+            totalPrice *= 0.15;  // 15% discount for 3 or more categories
+        }
+
         // Map paymentDto to Payment
         Payment payment = modelMapper.map(paymentDto, Payment.class);
         payment.setUser(user);
@@ -107,15 +110,12 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setPayment_screensort("");
         payment.setAddedDate(LocalDateTime.now());
         payment.setCategories(categories);
-        payment.setStatus(PaymentStatus.PENDING);//set the status to panding
+        payment.setStatus(PaymentStatus.PENDING); // Set the status to pending
 
-        
-        updateTotalPrice(payment);
         Payment newPayment = paymentRepo.save(payment);
         return modelMapper.map(newPayment, PaymentDto.class);
-        
- 
     }
+
     
     @Override
     public PaymentDto getPayment(Integer paymentId) {
@@ -153,6 +153,7 @@ public class PaymentServiceImpl implements PaymentService {
         return modelMapper.map(updatedPayment, PaymentDto.class);
     }
     
+    //---------------------approved payment-----------------------
     
     public PaymentDto approvePayment(Integer paymentId) {
         Payment payment = paymentRepo.findById(paymentId)
@@ -161,20 +162,40 @@ public class PaymentServiceImpl implements PaymentService {
         if (payment.getStatus() != PaymentStatus.PENDING) {
             throw new IllegalArgumentException("Payment is already " + payment.getStatus());
         }
-
+         
+       
         // Update payment status to APPROVED
         payment.setStatus(PaymentStatus.APPROVED);
         paymentRepo.save(payment);
 
+        // Fetch roles from roleRepo
+        Role normalUserRole = roleRepo.findByName("ROLE_NORMAL")
+                .orElseThrow(() -> new RuntimeException("Normal user role not found"));
+        Role subscribedUserRole = roleRepo.findByName("ROLE_SUBSCRIBE")
+                .orElseThrow(() -> new RuntimeException("Subscribed user role not found"));
+
+        
         // Update the user's faculty with the purchased categories
         User user = payment.getUser();
+        boolean isNormalUser = user.getRoles().contains(normalUserRole);
+        boolean isSubscribedUser = user.getRoles().contains(subscribedUserRole);
+
+        if (isNormalUser) {
+            // Remove NORMAL_USER role
+            user.getRoles().remove(normalUserRole);
+            // Add SUBSCRIBED_USER role
+            user.getRoles().add(subscribedUserRole);
+            userRepo.save(user);
+        }
+
+        
         List<String> categoryNames = payment.getCategories().stream()
                 .map(Category::getCategoryTitle)
                 .collect(Collectors.toList());
 
         List<String> existingFaculties = user.getFacult() != null ? user.getFacult() : new ArrayList<>();
         existingFaculties.addAll(categoryNames);
-
+        
         user.setFacult(existingFaculties);  // Update the user's faculties
         userRepo.save(user);  // Save the user with the updated faculties
 
