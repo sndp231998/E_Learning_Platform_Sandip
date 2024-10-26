@@ -184,10 +184,10 @@ private OtpRequestService sendmsg;
 
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
+       // user.setPassword(userDto.getPassword());
         user.setCollegename(userDto.getCollegename());
         user.setImageName(userDto.getImageName());
-
+     
         User updatedUser = this.userRepo.save(user);
         return this.userToDto(updatedUser);
     }
@@ -253,46 +253,14 @@ private OtpRequestService sendmsg;
         Role role = roleRepo.findByName(roleName)
                 .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName));
 
-        // Check if role change is to "teacher" (no payment required)
-        if (roleName.equalsIgnoreCase("Role_TEACHER")) {
-            user.getRoles().clear();  // Clear existing roles
-            user.getRoles().add(role);  // Add "teacher" role
-            user.setDate_Of_Role_Changed(LocalDateTime.now());  // Update role change date
-            userRepo.save(user);  // Save user
-            System.out.println("User role changed to Teacher.");
-            return;  // Return after role change
-        }
-
-        // Check if role change is to "subscribed" (payment required)
-        if (roleName.equalsIgnoreCase("ROLE_SUBSCRIBED")) {
-            List<Payment> payments = paymentRepo.findByUser(user);
-            
-            // If no payments found, throw exception
-            if (payments == null || payments.isEmpty()) {
-                throw new ResourceNotFoundException("Payment", "user", email);
-            }
-
-            // Get the latest payment
-            Payment latestPayment = payments.get(0);
-
-            // Ensure payment is valid (you can add more conditions if needed)
-            if (LocalDateTime.now().isAfter(LocalDateTime.parse(latestPayment.getValidDate(), FORMATTER))) {
-                throw new IllegalStateException("Payment is invalid or expired.");
-            }
-
-            // Clear existing roles and set "subscribed" role
-            user.getRoles().clear();
-            user.getRoles().add(role);
-            user.setDate_Of_Role_Changed(LocalDateTime.now());
-            user.setSubscriptionValidDate(LocalDateTime.parse(latestPayment.getValidDate(), FORMATTER));  // Set valid date
-
-            userRepo.save(user);  // Save user
-            System.out.println("User role changed to Subscribed after valid payment.");
-            return;
-        }
-
-        // Throw exception if roleName is neither "teacher" nor "subscribed"
-        throw new IllegalArgumentException("Invalid role change request.");
+        // Clear existing roles and assign new role
+        user.getRoles().clear();  // Clear all existing roles
+        user.getRoles().add(role);  // Assign new role
+        user.setDate_Of_Role_Changed(LocalDateTime.now());  // Update role change date
+        
+        // Save updated user
+        userRepo.save(user);
+        System.out.println("User role changed to " + roleName + ".");
     }
 
 
@@ -312,92 +280,20 @@ private OtpRequestService sendmsg;
                 .map(user -> modelMapper.map(user, UserDto.class))
                 .collect(Collectors.toList());
     }
-//1800000==30 min
-//    @Override
-//    @Scheduled(fixedRate =120000) // Runs every 2 minutes
-//    public void updateUserRoles() {
-//        logger.info("updateUserRoles method started");
-//        List<User> users = userRepo.findAll();
-//        logger.info("Number of users found: {}", users.size());
-//
-//        for (User user : users) {
-//            if (user.getSubscriptionValidDate() != null) { 
-//                LocalDateTime validDate = user.getSubscriptionValidDate();
-//                logger.info("Processing user: {}, Subscription Valid Date: {}", user.getEmail(), validDate);
-//
-//                for (Role role : user.getRoles()) {
-//                    LocalDateTime roleChangeDate = user.getDate_Of_Role_Changed();
-//                    logger.info("User role: {}, Role Change Date: {}", role.getName(), roleChangeDate);
-//
-//                    // Check if current date is after the valid date
-//                    if (roleChangeDate != null && LocalDateTime.now().isAfter(validDate)) {
-//                        logger.info("Conditions met for user: {}, Role: {}", user.getEmail(), role.getName());
-//
-//                        // Remove old role
-//                        user.getRoles().clear();
-//                        logger.info("Cleared old roles for user: {}", user.getEmail());
-//
-//                        // Add new role
-//                        Role newRole = this.roleRepo.findById(AppConstants.NORMAL_USER)
-//                                .orElseThrow(() -> new ResourceNotFoundException("Role", "id", AppConstants.NORMAL_USER));
-//
-//                        logger.info("Added new role: {} for user: {}", newRole.getName(), user.getEmail());
-//                        user.getRoles().add(newRole);
-//
-//                        // Clear the subscription valid date
-//                        user.setSubscriptionValidDate(null);
-//                        logger.info("Cleared subscription valid date for user: {}", user.getEmail());
-//
-//                        userRepo.save(user);
-//                        logger.info("User roles updated and saved for user: {}", user.getEmail());
-//                    } else {
-//                        logger.info("Conditions not met for user: {}, Role: {}", user.getEmail(), role.getName());
-//                    }
-//                }
-//            } else {
-//                logger.info("User {} does not have a subscription valid date", user.getEmail());
-//            }
-//        }
-//
-//        logger.info("updateUserRoles method completed");
-//    }
-//
-//    @Override
-//    @Scheduled(fixedRate = 86400000) // Runs daily
-//    public void sendSubscriptionExpiryWarnings() {
-//        logger.info("sendSubscriptionExpiryWarnings method started");
-//
-//        List<User> users = userRepo.findAll();
-//        for (User user : users) {
-//            if (user.getSubscriptionValidDate() != null) {
-//                LocalDateTime validDate = user.getSubscriptionValidDate();
-//                LocalDateTime now = LocalDateTime.now();
-//                LocalDateTime warningDate = validDate.minusDays(5);
-//
-//                if (now.isAfter(warningDate) && now.isBefore(validDate)) {
-//                    String message = "Your subscription is ending soon. Please renew your subscription to continue enjoying our services.";
-//                    notificationService.sendNotification(user.getName(), message);
-//                    logger.info("Created warning notification for user: {}, Subscription Valid Date: {}", user.getEmail(), validDate);
-//                }
-//            }
-//        }
-//
-//        logger.info("sendSubscriptionExpiryWarnings method completed");
-//    }
 
 
 
 //---------------Update-Faculty--------------------------------------------------------
-    @Override
-    public UserDto updateFaculty(UserDto userDto, Integer userId) {
-        User user = this.userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-        
-        user.setFaculty(userDto.getFaculty());
-        logger.info("Faculty from service "+userDto.getFaculty());
-        User updatedUser = this.userRepo.save(user);
-        return this.userToDto(updatedUser);
-    }
+//    @Override
+//    public UserDto updateFaculty(UserDto userDto, Integer userId) {
+//        User user = this.userRepo.findById(userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+//        
+//        user.setFaculty(userDto.getFaculty());
+//        logger.info("Faculty from service "+userDto.getFaculty());
+//        User updatedUser = this.userRepo.save(user);
+//        return this.userToDto(updatedUser);
+//    }
     
     //---------------update-Facult-------------------
     @Override

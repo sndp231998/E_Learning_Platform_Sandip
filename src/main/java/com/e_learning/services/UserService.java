@@ -44,7 +44,7 @@ UserDto registerNewUser(UserDto user);
     
     //---------faculty add and update ---------------
     
-    UserDto updateFaculty(UserDto user, Integer userId);
+    //UserDto updateFaculty(UserDto user, Integer userId);
     UserDto updateFacult(UserDto user,Integer userID);
     
     List<String> getFacultiesByUserId(int userId);

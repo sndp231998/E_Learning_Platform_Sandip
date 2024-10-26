@@ -37,9 +37,6 @@ import com.e_learning.services.UserService;
 import com.e_learning.services.impl.RateLimitingService;
 import com.e_learning.services.impl.UserServiceImpl;
 
-
-
-
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
@@ -152,13 +149,13 @@ public class UserController {
 		return ResponseEntity.ok(updatedDiscount);
 	}
 	
-	@PutMapping("/{userId}/faculty")
-	public ResponseEntity<UserDto> updateFaculty(@Valid @RequestBody UserDto userDto, @PathVariable("userId") Integer uid) {
-		UserDto updatedfaculty = this.userService.updateFaculty(userDto, uid);
-		String a=userDto.getFaculty();
-		logger.info("faculty form controller ..........................."+a);
-		return ResponseEntity.ok(updatedfaculty);
-	}
+//	@PutMapping("/{userId}/faculty")
+//	public ResponseEntity<UserDto> updateFaculty(@Valid @RequestBody UserDto userDto, @PathVariable("userId") Integer uid) {
+//		UserDto updatedfaculty = this.userService.updateFaculty(userDto, uid);
+//		String a=userDto.getFaculty();
+//		logger.info("faculty form controller ..........................."+a);
+//		return ResponseEntity.ok(updatedfaculty);
+//	}
 	
 	//-------------Image upload-------------------
 	// Post method for file upload

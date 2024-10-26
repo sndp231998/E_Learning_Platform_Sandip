@@ -10,13 +10,14 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/server1")
-                .setAllowedOrigins("*")
-                .withSockJS()
-                .setSessionCookieNeeded(false); // Disable cookies for session tracking
-    }
+	@Override
+	public void registerStompEndpoints(StompEndpointRegistry registry) {
+	    registry.addEndpoint("/server1")
+	            .setAllowedOriginPatterns("*") // Use patterns for dynamic origins
+	            .withSockJS()
+	            .setSessionCookieNeeded(false); // Disable cookies for session tracking
+	}
+
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -24,3 +25,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
     }
 }
+
