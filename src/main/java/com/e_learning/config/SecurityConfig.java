@@ -48,8 +48,8 @@ public class SecurityConfig {
 	            "/static/**",
 	           "/server1",//to connect with server
 	           "/topic/return-to", //to subscribe so that we can recive message
-//	           
 	           "/api/v1/auth/**", 
+	           "/upload-image"
 //	            "/v3/api-docs",
 //	            "/v2/api-docs",
 //	            "/swagger-resources/**",
