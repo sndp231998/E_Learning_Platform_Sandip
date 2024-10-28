@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -31,8 +32,11 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    private static final String UPLOAD_PATH = "/path/to/upload";
+    //private static final String UPLOAD_PATH = "/images";
 
+    @Value("${project.image}")
+	private String UPLOAD_PATH;
+    
     @MessageMapping("/message")
     @SendTo("/topic/return-to")
     public Message getContent(Message message) {
