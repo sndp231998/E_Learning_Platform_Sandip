@@ -221,6 +221,7 @@ private OtpRequestService sendmsg;
     public void deleteUser(Integer userId) {
         User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+      user.getRoles().clear();
         this.userRepo.delete(user);
     }
 
