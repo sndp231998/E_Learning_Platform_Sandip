@@ -31,6 +31,7 @@ import com.e_learning.payloads.CategoryDto;
 import com.e_learning.payloads.ExamDto;
 import com.e_learning.payloads.PaymentDto;
 import com.e_learning.payloads.PaymentRequest;
+import com.e_learning.repositories.RoleRepo;
 import com.e_learning.services.FileService;
 import com.e_learning.services.PaymentService;
 

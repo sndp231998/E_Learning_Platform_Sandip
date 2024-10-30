@@ -6,13 +6,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.e_learning.config.AppConstants;
 import com.e_learning.entities.Category;
 import com.e_learning.entities.Payment;
 import com.e_learning.entities.Payment.PaymentStatus;
@@ -29,6 +31,8 @@ import com.e_learning.services.PaymentService;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
+
     @Autowired
     private PaymentRepo paymentRepo;
 
@@ -41,6 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
     private RoleRepo roleRepo;
     
  
@@ -62,6 +67,9 @@ public class PaymentServiceImpl implements PaymentService {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "User id", userId));
 
+//        Category = categoryRepo.findById(categoryIds)
+//        		.orElseThrow(()-> new ResourceNotFoundException("Category","Category id",categoryId));
+//        		
         if (categoryIds == null || categoryIds.isEmpty()) {
             throw new IllegalArgumentException("Category IDs cannot be null or empty.");
         }
@@ -98,10 +106,11 @@ public class PaymentServiceImpl implements PaymentService {
 
         // Apply discount based on the number of categories selected
         if (categoryIds.size() == 2) {
-            totalPrice *= 0.10;  // 10% discount for 2 categories
+            totalPrice *= 0.90;  // Reduce by 10% for 2 categories
         } else if (categoryIds.size() >= 3) {
-            totalPrice *= 0.15;  // 15% discount for 3 or more categories
+            totalPrice *= 0.85;  // Reduce by 15% for 3 or more categories
         }
+
 
         // Map paymentDto to Payment
         Payment payment = modelMapper.map(paymentDto, Payment.class);
@@ -168,35 +177,38 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(PaymentStatus.APPROVED);
         paymentRepo.save(payment);
 
-        // Fetch roles from roleRepo
-        Role normalUserRole = roleRepo.findByName("ROLE_NORMAL")
-                .orElseThrow(() -> new RuntimeException("Normal user role not found"));
-        Role subscribedUserRole = roleRepo.findByName("ROLE_SUBSCRIBE")
-                .orElseThrow(() -> new RuntimeException("Subscribed user role not found"));
-
-        
-        // Update the user's faculty with the purchased categories
+//        
+       
         User user = payment.getUser();
-        boolean isNormalUser = user.getRoles().contains(normalUserRole);
-        boolean isSubscribedUser = user.getRoles().contains(subscribedUserRole);
-
-        if (isNormalUser) {
-            // Remove NORMAL_USER role
-            user.getRoles().remove(normalUserRole);
-            // Add SUBSCRIBED_USER role
-            user.getRoles().add(subscribedUserRole);
-            userRepo.save(user);
-        }
-
+       
+        Role newRole = this.roleRepo.findById(AppConstants.SUBSCRIBED_USER)
+              .orElseThrow(() -> new ResourceNotFoundException("Role", "id", AppConstants.SUBSCRIBED_USER));
+//
+      logger.info("Added new role: {} for user: {}", newRole.getName(), user.getEmail());
+//     
+      user.getRoles().clear();
+        user.getRoles().add(newRole);
+       
         
+        userRepo.save(user);
+
+        // Update the user's faculty with the purchased categories
         List<String> categoryNames = payment.getCategories().stream()
                 .map(Category::getCategoryTitle)
                 .collect(Collectors.toList());
 
+     // Log the category names
+        logger.info("Category Titles for paymentId {}: {}", paymentId, categoryNames);
+
         List<String> existingFaculties = user.getFacult() != null ? user.getFacult() : new ArrayList<>();
         existingFaculties.addAll(categoryNames);
         
+        logger.info("Existing Faculties before update for userId {}: {}", user.getId(), existingFaculties);
+
         user.setFacult(existingFaculties);  // Update the user's faculties
+        
+        logger.info("Updated Faculties after adding categories for userId {}: {}", user.getId(), user.getFacult());
+
         userRepo.save(user);  // Save the user with the updated faculties
 
         return modelMapper.map(payment, PaymentDto.class);
