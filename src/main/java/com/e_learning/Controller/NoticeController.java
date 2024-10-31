@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.e_learning.entities.User;
-import com.e_learning.payloads.ExamDto;
+
 import com.e_learning.payloads.NoticeDto;
-import com.e_learning.payloads.UserDto;
+
 import com.e_learning.services.FileService;
 import com.e_learning.services.NoticeService;
 
@@ -91,29 +91,14 @@ public class NoticeController {
 		    		
 		    return new ResponseEntity<>(notices, HttpStatus.OK);
 		}
-	//// Get notices by user ID
-	@GetMapping("/user/{userId}/notices")
-	public ResponseEntity<List<NoticeDto>> getNoticesByUserId(@PathVariable Integer userId) {
-	    List<NoticeDto> notices = noticeService.getNoticesByUserId(userId);
-	    return ResponseEntity.ok(notices);
-	}
-
-	// Check if a specific user has read a specific notice
-    @GetMapping("/hasRead/{userId}/{noticeId}")
-    public ResponseEntity<Boolean> hasUserReadNotice(
-            @PathVariable Integer userId,
-            @PathVariable Long noticeId) {
-        boolean hasRead = noticeService.hasUserReadNotice(userId, noticeId);
-        return ResponseEntity.ok(hasRead);
-    }
-
- // View and mark a notice as read
-//    @GetMapping("/user/{userId}/notices/{noticeId}")
-//    public ResponseEntity<NoticeDto> viewNotice(@PathVariable Integer userId, @PathVariable Long noticeId) {
-//        NoticeDto noticeDto = this.noticeService.getNoticeById(noticeId);
-//        this.noticeService.
-//        markNoticeAsRead(userId, noticeId); // Mark as read
-//        return ResponseEntity.ok(noticeDto);
-//    }
+		 // Endpoint to check if a user has seen a specific notice
+		@GetMapping("/user/{userId}/notice/{noticeId}/seen")
+	    public ResponseEntity<Boolean> hasUserSeenNotice(
+	            @PathVariable Integer userId,
+	            @PathVariable Long noticeId) {
+	        boolean hasSeen = noticeService.hasUserSeenNotice(userId, noticeId);
+	        return ResponseEntity.ok(hasSeen);
+	    }
+	
 
 }

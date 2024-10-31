@@ -9,17 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Category;
-import com.e_learning.entities.Exam;
+
 import com.e_learning.entities.Notice;
 import com.e_learning.entities.User;
-import com.e_learning.entities.UserNoticeStatus;
+
 import com.e_learning.exceptions.ResourceNotFoundException;
-import com.e_learning.payloads.ExamDto;
+
 import com.e_learning.payloads.NoticeDto;
-import com.e_learning.payloads.UserDto;
+
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.NoticeRepo;
-import com.e_learning.repositories.UserNoticeStatusRepo;
+
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.NoticeService;
 
@@ -34,56 +34,10 @@ public  class NoticeServiceImpl implements NoticeService{
     @Autowired
     private UserRepo userRepo;
 
-    @Autowired
-    private UserNoticeStatusRepo userNoticeStatusRepo;
-    
+   
     @Autowired
     private CategoryRepo categoryRepo;
-      
-    
-    
- // Method to mark a notice as read by a specific user
-    public void markNoticeAsRead(Integer userId, Long noticeId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-
-        Notice notice = noticeRepo.findById(noticeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Notice", "noticeId", noticeId));
-
-        UserNoticeStatus status = userNoticeStatusRepo.findByUser_IdAndNotice_NoticeId(userId, noticeId)
-                .orElseGet(() -> {
-                    UserNoticeStatus newStatus = new UserNoticeStatus();
-                    newStatus.setUser(user);
-                    newStatus.setNotice(notice);
-                    return newStatus;
-                });
-
-        status.setReadStatus(true);
-        status.setReadDate(LocalDateTime.now());
-        userNoticeStatusRepo.save(status);
-    }
-    
-	
-    // Check if a specific user has read a specific notice
- public boolean hasUserReadNotice(Integer userId, Long noticeId) {
-     return userNoticeStatusRepo.findByUser_IdAndNotice_NoticeId(userId, noticeId)
-             .map(UserNoticeStatus::getReadStatus)
-             .orElse(false); // Returns false if no record is found (meaning it's unread)
- }
-    
-    // Retrieve unread notices for a specific user
-    public List<NoticeDto> getUnreadNoticesByUser(Integer userId) {
-        List<UserNoticeStatus> unreadStatuses = userNoticeStatusRepo.findByUser_IdAndReadStatus(userId, false);
-        
-        return unreadStatuses.stream()
-                .map(status -> modelMapper.map(status.getNotice(), NoticeDto.class))
-                .collect(Collectors.toList());
-    }
-    
-    
-
-    
-    
+  
     
 	@Override
 	public NoticeDto createNotice(NoticeDto noticeDto, Integer userId, Integer categoryId) {
@@ -143,6 +97,12 @@ public  class NoticeServiceImpl implements NoticeService{
 	    // No need for toString() now as the method accepts NoticeType
 	    List<Notice> notices = this.noticeRepo.findByNoticeType(Notice.NoticeType.FOR_ALL);
 	    
+	    notices.forEach(notice -> {
+	        notice.setIsRead(true);
+	        notice.setReadDate(LocalDateTime.now()); // Optionally set read date
+	        this.noticeRepo.save(notice); // Save updated notice back to the database
+	    });
+	    
 	    return notices.stream()
 	                  .map(this::noticeToDto)
 	                  .collect(Collectors.toList());
@@ -163,20 +123,12 @@ public  class NoticeServiceImpl implements NoticeService{
 	
 
 	@Override
-	public List<NoticeDto> getNoticesByUserId(Integer userId) {
-	    List<Notice> notices = noticeRepo.findByUser_Id(userId); // Using a custom query in NoticeRepo
-	    return notices.stream().map(this::noticeToDto).collect(Collectors.toList());
-	}
-
-
-
-
-	@Override
 	public List<NoticeDto> getNoticsByUserFaculty(Integer userId, String faculty) {
 		//get user id
 		User user = this.userRepo.findById(userId)
 	            .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-//	    
+		  
+		//	    
 //	    // Get the user's faculties (multiple faculties)
 	    List<String> userFacult = user.getFacult();
 //	    
@@ -184,6 +136,8 @@ public  class NoticeServiceImpl implements NoticeService{
 	    if (!userFacult.contains(faculty)) {
         throw new ResourceNotFoundException("Faculty", "faculty", faculty);
 	    }
+	    
+	    
 //	    // Find the category that matches the provided faculty
 	    Category category = this.categoryRepo.findByCategoryTitle(faculty);
 	    if (category == null) {
@@ -191,14 +145,36 @@ public  class NoticeServiceImpl implements NoticeService{
 	    }
 	    // Fetch notics associated with the category
 	    List<Notice> notics = this.noticeRepo.findByCategory(category);
-//	    // Convert exams to ExamDto
-	    List<NoticeDto> noticeDtos = notics.stream()
-	                                  .map(notice -> this.modelMapper.map(notice, NoticeDto.class))
-	                                  .collect(Collectors.toList());
-//
-	    return noticeDtos;
+
+	 // Set isRead to true for each notice fetched by faculty
+	    notics.forEach(notice -> {
+	        notice.setIsRead(true);
+	        notice.setReadDate(LocalDateTime.now()); // Optionally set read date
+	        this.noticeRepo.save(notice); // Save updated notice back to the database
+	    });
+	    //	    // Convert exams to ExamDto
+//	    List<NoticeDto> noticeDtos = notics.stream()
+//	                                  .map(notice -> this.modelMapper.map(notice, NoticeDto.class))
+//	                                  .collect(Collectors.toList());
+
+	    
+	    return notics.stream()
+                .map(this::noticeToDto)
+                .collect(Collectors.toList());
 	}
+	  @Override
+	    public boolean hasUserSeenNotice(Integer userId, Long noticeId) {
+	        // Verify the existence of the user and notice
+	        User user = userRepo.findById(userId)
+	            .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
 
+	        Notice notice = noticeRepo.findById(noticeId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Notice", "noticeId", noticeId));
 
+	        // Check if the notice is associated with this user and if it has been read
+	        // Check if the notice is associated with this user and if it has been read
+	        return user.getId() == userId && Boolean.TRUE.equals(notice.getIsRead());
+
+	    }
 
 }
