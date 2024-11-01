@@ -27,4 +27,10 @@ public interface PaymentService {
 			//Update 
 			PaymentDto updatePayment(PaymentDto paymentDto, Integer paymentId);
 
+			Integer getWeeklyRevenue();
+
+			Integer getMonthlyRevenue();
+
+			Integer getYearlyRevenue();
+
 }

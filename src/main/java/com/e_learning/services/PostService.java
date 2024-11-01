@@ -51,4 +51,6 @@ public interface PostService {
 		
 		List<PostDto> getPostsByCategoryId(Integer categoryId);
 		
+		
+		
 }

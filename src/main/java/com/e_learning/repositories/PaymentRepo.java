@@ -33,13 +33,12 @@ public interface PaymentRepo extends JpaRepository<Payment,Integer>{
     // Get all categories a user has already paid for
     @Query("SELECT c FROM Payment p JOIN p.categories c WHERE p.user.id = :userId")
     List<Category> findCategoriesByUserId(@Param("userId") Integer userId);
-//	List<Payment> findByUser(User user);
-//
-//	Optional<Payment> findByUserAndCategory(User user, Category category);
-//
-//	
-//	@Query("SELECT c FROM Payment p JOIN p.categories c WHERE p.user.id = :userId")
-//	List<Category> findCategoriesByUserId(@Param("userId") Integer userId);
+
+    @Query("SELECT SUM(p.totalPrice) FROM Payment p WHERE p.addedDate >= :startDate AND p.addedDate < :endDate")
+    Integer calculateTotalRevenue(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT p FROM Payment p WHERE p.addedDate >= :startDate AND p.addedDate < :endDate")
+    List<Payment> findPaymentsByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 	
 }

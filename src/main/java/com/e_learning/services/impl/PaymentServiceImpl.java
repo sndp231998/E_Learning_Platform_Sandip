@@ -1,6 +1,8 @@
 package com.e_learning.services.impl;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -256,23 +258,25 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 
+    @Override
+    public Integer getWeeklyRevenue() {
+        LocalDateTime startOfWeek = LocalDateTime.now().with(java.time.DayOfWeek.MONDAY).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endOfWeek = startOfWeek.plusWeeks(1);
+        return paymentRepo.calculateTotalRevenue(startOfWeek, endOfWeek);
+    }
 
-    
+    @Override
+    public Integer getMonthlyRevenue() {
+        LocalDateTime startOfMonth = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+        return paymentRepo.calculateTotalRevenue(startOfMonth, endOfMonth);
+    }
 
-
-    
-
-    // Add the category names/IDs to the user's facult list
-//  List<String> categoryNames = categories.stream()
-//      .map(Category::getCategoryTitle) // Assuming Category entity has a 'name' field
-//      .collect(Collectors.toList());
-//
-//  List<String> existingFaculties = user.getFacult() != null ? user.getFacult() : new ArrayList<>();
-//  existingFaculties.addAll(categoryNames);
-//  
-//  user.setFacult(existingFaculties);  // Update the user's faculties
-//
-//        Payment newPayment = paymentRepo.save(payment);
-//  return modelMapper.map(newPayment, PaymentDto.class);
+    @Override
+    public Integer getYearlyRevenue() {
+        LocalDateTime startOfYear = LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endOfYear = startOfYear.plusYears(1);
+        return paymentRepo.calculateTotalRevenue(startOfYear, endOfYear);
+    }
 
 }

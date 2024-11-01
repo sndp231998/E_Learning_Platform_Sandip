@@ -2,6 +2,7 @@ package com.e_learning.Controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpHeaders;
 import java.util.Collections;
 import java.util.List;
 
@@ -177,41 +178,67 @@ public class PostController {
 //
 //	}
 //	
-	// Post method for file upload
-    @PostMapping("/post/file/upload/{postId}")
-    public ResponseEntity<PostDto> uploadExamFile(@RequestParam("file") MultipartFile file,
-                                                  @PathVariable Integer postId) throws IOException {
-        PostDto postDto = this.postService.getPostById(postId);
-        String fileName = this.fileService.uploadFile(path, file);
-        postDto.setImageName(fileName);  // Assuming you want to set the uploaded file name as imageName
-        PostDto updatedPost = this.postService.updatePost(postDto, postId);
-        return new ResponseEntity<>(updatedPost, HttpStatus.OK);
-    }
+	// Updated upload method for multiple file types
+	@PostMapping("/post/file/upload/{postId}")
+	public ResponseEntity<PostDto> uploadExamFile(@RequestParam("file") MultipartFile file,
+	                                              @PathVariable Integer postId) throws IOException {
+	    // Get the file extension in lowercase
+	    String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename()).toLowerCase();
 
-    //method to serve files
-    @GetMapping(value = "/post/image/{imageName}",produces = MediaType.IMAGE_JPEG_VALUE)
-    public void downloadImage(
-            @PathVariable("imageName") String imageName,
-            HttpServletResponse response
-    ) throws IOException {
-    	String fileExtension = FilenameUtils.getExtension(imageName).toLowerCase();
-        MediaType mediaType = MediaType.IMAGE_JPEG;  // Default
+	    // Allowable file types
+	    if (!fileExtension.equals("pdf") && !fileExtension.equals("jpeg") && !fileExtension.equals("jpg")
+	            && !fileExtension.equals("png") && !fileExtension.equals("pptx")) {
+	        return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+	    }
 
-        if (fileExtension.equals("png")) {
-            mediaType = MediaType.IMAGE_PNG;
-        } else if (fileExtension.equals("jpg") || fileExtension.equals("jpeg")) {
-            mediaType = MediaType.IMAGE_JPEG;
-        }
+	    // Continue with file upload
+	    PostDto postDto = this.postService.getPostById(postId);
+	    String fileName = this.fileService.uploadFile(path, file);
+	    postDto.setImageName(fileName);  // Assuming imageName is used for storing any file type name
+	    PostDto updatedPost = this.postService.updatePost(postDto, postId);
+	    return new ResponseEntity<>(updatedPost, HttpStatus.OK);
+	}
 
-        response.setContentType(mediaType.toString());
-        try (InputStream resource = this.fileService.getResource(path, imageName)) {
-            StreamUtils.copy(resource, response.getOutputStream());
-        }
-    }
-//        InputStream resource = this.fileService.getResource(path, imageName);
-//        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-//        StreamUtils.copy(resource,response.getOutputStream())   ;
-//
+	// Method to serve files of various types
+	@GetMapping(value = "/post/image/{fileName}")
+	public void downloadFile(
+	        @PathVariable("fileName") String fileName,
+	        HttpServletResponse response
+	) throws IOException {
+	    // Determine the file extension to set content type
+	    String fileExtension = FilenameUtils.getExtension(fileName).toLowerCase();
+	    MediaType mediaType;
+
+	    switch (fileExtension) {
+	        case "png":
+	            mediaType = MediaType.IMAGE_PNG;
+	            break;
+	        case "jpg":
+	        case "jpeg":
+	            mediaType = MediaType.IMAGE_JPEG;
+	            break;
+	        case "pdf":
+	            mediaType = MediaType.APPLICATION_PDF;
+	            break;
+	        case "pptx":
+	            mediaType = MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+	            break;
+	        default:
+	            mediaType = MediaType.APPLICATION_OCTET_STREAM;
+	    }
+
+	    // Set the content type
+	    response.setContentType(mediaType.toString());
+	    
+	    // Set the Content-Disposition header manually
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+	    // Serve the file
+	    try (InputStream resource = this.fileService.getResource(path, fileName)) {
+	        StreamUtils.copy(resource, response.getOutputStream());
+	    }
+	}
+
 //    }
     //Get Posts by category id
     @GetMapping("/category/{categoryId}")

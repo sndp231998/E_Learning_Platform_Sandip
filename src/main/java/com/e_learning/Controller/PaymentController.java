@@ -156,4 +156,21 @@ public class PaymentController {
 	          PaymentDto payment = this.paymentService.getPayment(paymentId);
 	          return ResponseEntity.ok(payment);
 	      }
+	      
+	      
+	      
+	      @GetMapping("/weekly")
+	      public ResponseEntity<Integer> getWeeklyRevenue() {
+	          return ResponseEntity.ok(paymentService.getWeeklyRevenue());
+	      }
+
+	      @GetMapping("/monthly")
+	      public ResponseEntity<Integer> getMonthlyRevenue() {
+	          return ResponseEntity.ok(paymentService.getMonthlyRevenue());
+	      }
+
+	      @GetMapping("/yearly")
+	      public ResponseEntity<Integer> getYearlyRevenue() {
+	          return ResponseEntity.ok(paymentService.getYearlyRevenue());
+	      }
 }
