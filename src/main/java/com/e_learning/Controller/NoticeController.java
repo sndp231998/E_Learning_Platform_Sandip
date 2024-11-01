@@ -12,12 +12,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.e_learning.entities.Notice;
+import com.e_learning.entities.Notice.NoticeType;
 import com.e_learning.entities.User;
 
 import com.e_learning.payloads.NoticeDto;
@@ -76,13 +78,28 @@ public class NoticeController {
 	}
 	 // Get all notices with FOR_ALL type
 //	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("/notices")
-	public ResponseEntity<List<NoticeDto>> getAllNotices() {
-		
-		return ResponseEntity.ok(this.noticeService.getAllNotices());
-	}
+	 // Get all notices (FOR_ALL type only)
+    @GetMapping("/user/{userId}/notices")
+    public ResponseEntity<List<NoticeDto>> getAllNotices(@PathVariable Integer userId) {
+
+       
+        List<NoticeDto> notices = noticeService.getAllNotices(userId);
+        return new ResponseEntity<>(notices, HttpStatus.OK);
+    }
+
 	 
 	
+	// Mark notice as read
+    @PutMapping("/user/{userId}/notices/{noticeId}/read")
+    public ResponseEntity<Notice> markNoticeAsRead(
+            @PathVariable Integer userId,
+            @PathVariable Long noticeId) {
+
+      
+        Notice updatedNotice = noticeService.makeNoticeAsRead(userId, noticeId);
+        return new ResponseEntity<>(updatedNotice, HttpStatus.OK);
+    }
+
 	//get notices By userFaculty
 		@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
 		@GetMapping("notices/user/{userId}/faculty/{faculty}")
@@ -93,12 +110,17 @@ public class NoticeController {
 		}
 		 // Endpoint to check if a user has seen a specific notice
 		@GetMapping("/user/{userId}/notice/{noticeId}/seen")
-	    public ResponseEntity<Boolean> hasUserSeenNotice(
-	            @PathVariable Integer userId,
-	            @PathVariable Long noticeId) {
-	        boolean hasSeen = noticeService.hasUserSeenNotice(userId, noticeId);
-	        return ResponseEntity.ok(hasSeen);
+	    public ResponseEntity<Boolean> isNoticeReadByUser(@PathVariable Integer userId, @PathVariable Long noticeId) {
+	        boolean isRead = noticeService.isNoticeReadByUser(userId, noticeId);
+	        		
+	        return ResponseEntity.ok(isRead);
 	    }
 	
+//		@GetMapping("user/{userId}/notice/{noticeType}/unread-count")
+//		public int getUnreadCount(
+//		        @PathVariable Integer userId,
+//		        @PathVariable NoticeType noticeType) {
+//		    return noticeService.countUnreadNoticesByUserId(userId, noticeType);
+//		}
 
 }

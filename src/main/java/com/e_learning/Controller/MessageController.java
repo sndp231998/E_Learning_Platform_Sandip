@@ -53,7 +53,9 @@ public class MessageController {
     @PostMapping("/upload-image")
     public Message uploadImage(@RequestParam("file") MultipartFile file, 
                                @RequestParam("name") String name,
-                               @RequestParam("content") String content) throws IOException {
+                               @RequestParam("content") String content,
+                               @RequestParam("courseType") String courseType
+    		) throws IOException {
         String imageUrl = fileService.uploadFile(UPLOAD_PATH, file); // Upload file and get URL
 
         // Create a message object with the image URL
@@ -61,7 +63,7 @@ public class MessageController {
         message.setName(name);
         message.setContent(content);
         message.setImageUrl(imageUrl); // Set image URL in message
-
+        message.setCourseType(courseType);
         messageService.saveMessage(message); // Save message to history
         return message; // Return the message with image URL
     }

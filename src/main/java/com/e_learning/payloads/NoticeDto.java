@@ -32,9 +32,7 @@ public class NoticeDto {
 	  
 	  private String imageName;
 	  
-	  
-	  private Boolean isRead = false; // Default is unread // false for unread, true for read
-
+	 
 	    private LocalDateTime readDate; // Optional: timestamp when the notice was read
 	  
 	  private Notice.NoticeType noticeType; 
