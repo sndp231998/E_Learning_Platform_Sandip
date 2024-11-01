@@ -173,4 +173,9 @@ public class PaymentController {
 	      public ResponseEntity<Integer> getYearlyRevenue() {
 	          return ResponseEntity.ok(paymentService.getYearlyRevenue());
 	      }
+	      
+	      @GetMapping("/daily")
+	      public ResponseEntity<Integer> getDailyRevenue() {
+	          return ResponseEntity.ok(paymentService.getDailyRevenue());
+	      }
 }

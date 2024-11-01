@@ -33,4 +33,6 @@ public interface PaymentService {
 
 			Integer getYearlyRevenue();
 
+			Integer getDailyRevenue();
+
 }

@@ -1,6 +1,7 @@
 package com.e_learning.services.impl;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.PaymentRepo;
 import com.e_learning.repositories.RoleRepo;
 import com.e_learning.repositories.UserRepo;
+import com.e_learning.services.NotificationService;
 import com.e_learning.services.PaymentService;
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -50,7 +52,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private RoleRepo roleRepo;
     
- 
+    @Autowired
+    private NotificationService notificationService;
+    
     public void updateTotalPrice(Payment payment) {
         if (payment.getCategories() != null && !payment.getCategories().isEmpty()) {
             // Calculate the total price based on selected categories
@@ -124,7 +128,20 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(PaymentStatus.PENDING); // Set the status to pending
 
         Payment newPayment = paymentRepo.save(payment);
+        
+        
+        
+        String welcomeMessage = String.format("Welcome, %s! We're excited to have you on our eLearning platform. Dive in and enjoy the journey ahead! "
+        		+ "Thank you for choosing us, Utkrista Shikshya", user.getName());
+        
+
+     // Create in-app notification
+        notificationService.createNotification(user.getId(), welcomeMessage);
+        
         return modelMapper.map(newPayment, PaymentDto.class);
+        
+       
+        
     }
 
     
@@ -279,4 +296,10 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepo.calculateTotalRevenue(startOfYear, endOfYear);
     }
 
+    @Override
+    public Integer getDailyRevenue() {
+        LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);  // Beginning of today
+        LocalDateTime endOfDay = startOfDay.plusDays(1);  // End of today
+        return paymentRepo.calculateTotalRevenue(startOfDay, endOfDay);
+    }
 }

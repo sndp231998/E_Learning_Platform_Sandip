@@ -31,6 +31,7 @@ import com.e_learning.repositories.OtpRequestRepo;
 import com.e_learning.repositories.PaymentRepo;
 import com.e_learning.repositories.RoleRepo;
 import com.e_learning.repositories.UserRepo;
+import com.e_learning.services.NotificationService;
 import com.e_learning.services.OtpRequestService;
 import com.e_learning.services.UserService;
 
@@ -52,13 +53,16 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private NotificationService notificationService;
+    
+    @Autowired
     private RoleRepo roleRepo;
 
     @Autowired
     private PaymentRepo paymentRepo;
 
-    @Autowired
-    private NotificationService notificationService;
+   // @Autowired
+   // private NotificationService notificationService;
 
     private CategoryRepo categoryRepo;
     @Autowired
@@ -118,6 +122,9 @@ private OtpRequestService sendmsg;
         		+ "Thank you for choosing us, Utkrista Shikshya", user.getName());
         sendmsg.sendMessage(user.getMobileNo(), welcomeMessage); // Assuming notificationService sends SMS
 
+     // Create in-app notification
+        notificationService.createNotification(newUser.getId(), welcomeMessage);
+        
         return this.modelMapper.map(newUser, UserDto.class);
     }
     
