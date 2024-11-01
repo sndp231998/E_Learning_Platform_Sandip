@@ -22,10 +22,5 @@ public interface NoticeRepo extends JpaRepository<Notice, Long> {
 	
 	
 	 List<Notice> findByNoticeType(Notice.NoticeType noticeType);
-	int countUnreadByUserIdAndType(Integer userId, NoticeType noticeType);
 	
-	// int countByUserIdAndIsReadFalseAndNoticeType(Integer userId, String noticeType);
-	 
-//	  @Query("SELECT COUNT(un) FROM UserNotice un WHERE un.user.id = :userId AND un.isRead = false AND un.notice.noticeType = :noticeType")
-//	    int countUnreadNoticesByUserIdAndNoticeType(@Param("userId") Integer userId, @Param("noticeType") String noticeType);
 }
