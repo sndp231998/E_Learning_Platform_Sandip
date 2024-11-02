@@ -11,4 +11,6 @@ public interface NotificationService {
     List<Notification> getUnreadNotificationsForUser(Integer userId);
     
     void markNotificationsAsRead(Integer userId); // optional if you want read marking
+
+	List<Notification> getAllNotificationsForUser(Integer userId);
 }

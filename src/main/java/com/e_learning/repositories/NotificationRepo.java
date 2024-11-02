@@ -13,6 +13,6 @@ public interface NotificationRepo extends JpaRepository<Notification, Integer> {
 
     // Mark all notifications as read for a user (if needed)
     List<Notification> findByUserId(Integer userId);
-    
+   
 
 }

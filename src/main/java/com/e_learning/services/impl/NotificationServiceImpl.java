@@ -31,10 +31,10 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepo.save(notification);
     }
 
-    @Override
-    public List<Notification> getUnreadNotificationsForUser(Integer userId) {
-        return notificationRepo.findByUserIdAndIsReadFalse(userId);
-    }
+//    @Override
+//    public List<Notification> getUnreadNotificationsForUser(Integer userId) {
+//        return notificationRepo.findByUserIdAndIsReadFalse(userId);
+//    }
 
     @Override
     public void markNotificationsAsRead(Integer userId) {
@@ -42,4 +42,17 @@ public class NotificationServiceImpl implements NotificationService {
         notifications.forEach(notification -> notification.setRead(true));
         notificationRepo.saveAll(notifications);
     }
+
+	@Override
+	public List<Notification> getUnreadNotificationsForUser(Integer userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+   
+	@Override
+	public List<Notification> getAllNotificationsForUser(Integer userId) {
+	    return notificationRepo.findByUserId(userId); // Gets both read and unread notifications
+	}
+
+    
 }

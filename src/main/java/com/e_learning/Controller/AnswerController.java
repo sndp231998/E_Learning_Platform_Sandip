@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.hibernate.engine.jdbc.StreamUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,5 +142,15 @@ public class AnswerController {
  		return new ResponseEntity<List<AnswerDto>>(answers, HttpStatus.OK);
 
  	}
+ 	
+ 	//@PreAuthorize("hasRole('ADMIN')")
+ 		@PutMapping("/{answerId}/score")
+ 		public ResponseEntity<AnswerDto> updateScore(@Valid @RequestBody AnswerDto answerDto, @PathVariable("answerId") Integer aid) {
+ 			AnswerDto updatedAnswer = this.answerService.updateScore(answerDto, aid);
+ 				Double a=	answerDto.getScore();
+ 				
+ 			
+ 			return ResponseEntity.ok(updatedAnswer);
+ 		}
   
 }

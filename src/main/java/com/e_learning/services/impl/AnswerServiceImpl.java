@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Answer;
-import com.e_learning.entities.Category;
+
 import com.e_learning.entities.Exam;
-import com.e_learning.entities.Post;
+
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.AnswerDto;
@@ -78,6 +78,7 @@ public class AnswerServiceImpl implements AnswerService {
         Answer answer = this.answerRepo.findById(answerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Answer", "answer id", answerId));
 
+        answer.setScore(answerDto.getScore());
         answer.setImageName(answerDto.getImageName());
 
         Answer updatedAnswer = this.answerRepo.save(answer);
@@ -107,4 +108,15 @@ public class AnswerServiceImpl implements AnswerService {
         return answerDtos;
     }
 
+    @Override
+    public AnswerDto updateScore(AnswerDto answerDto, Integer answerId) {
+        Answer ans = this.answerRepo.findById(answerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Answer", "Id", answerId));
+        
+        ans.setScore(answerDto.getScore());
+       
+        Answer updatedAns = this.answerRepo.save(ans);
+        return this.modelMapper.map(updatedAns,AnswerDto.class);
+    }
+    
 }

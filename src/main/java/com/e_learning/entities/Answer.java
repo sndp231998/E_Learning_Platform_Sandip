@@ -26,6 +26,8 @@ public class Answer {
 	
 	 private LocalDateTime addedDate;
 	 
+	 private Double score;
+	 
 	@ManyToOne
 	 @JoinColumn(name = "exam_id")
 	private Exam exam;

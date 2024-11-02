@@ -24,4 +24,6 @@ public interface AnswerService {
 	//List<AnswerDto> findByExamCategory(String categoryTitle);
 	
 	List<AnswerDto> getAnswersByExam(Integer examId);
+
+	AnswerDto updateScore(AnswerDto answerDto, Integer answerId);
 }

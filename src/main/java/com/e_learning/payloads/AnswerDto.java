@@ -15,6 +15,8 @@ public class AnswerDto {
 
 	private String imageName;
 	
+	private Double score; 
+	
 	 private LocalDateTime addedDate;
 	 
 	
