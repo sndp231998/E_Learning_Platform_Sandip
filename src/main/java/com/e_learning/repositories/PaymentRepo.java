@@ -37,8 +37,8 @@ public interface PaymentRepo extends JpaRepository<Payment,Integer>{
     @Query("SELECT SUM(p.totalPrice) FROM Payment p WHERE p.addedDate >= :startDate AND p.addedDate < :endDate")
     Integer calculateTotalRevenue(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT p FROM Payment p WHERE p.addedDate >= :startDate AND p.addedDate < :endDate")
-    List<Payment> findPaymentsByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+//    @Query("SELECT p FROM Payment p WHERE p.addedDate >= :startDate AND p.addedDate < :endDate")
+//    List<Payment> findPaymentsByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 	
 }

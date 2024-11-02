@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -157,25 +158,26 @@ public class PaymentController {
 	          return ResponseEntity.ok(payment);
 	      }
 	      
-	      
-	      
-	      @GetMapping("/weekly")
-	      public ResponseEntity<Integer> getWeeklyRevenue() {
-	          return ResponseEntity.ok(paymentService.getWeeklyRevenue());
+	      @GetMapping("/monthly/revenue")
+	      public ResponseEntity<Map<String, Integer>> getMonthlyRevenues() {
+	          return ResponseEntity.ok(paymentService.getMonthlyRevenues());
 	      }
 
-	      @GetMapping("/monthly")
-	      public ResponseEntity<Integer> getMonthlyRevenue() {
-	          return ResponseEntity.ok(paymentService.getMonthlyRevenue());
-	      }
-
-	      @GetMapping("/yearly")
-	      public ResponseEntity<Integer> getYearlyRevenue() {
-	          return ResponseEntity.ok(paymentService.getYearlyRevenue());
-	      }
 	      
-	      @GetMapping("/daily")
-	      public ResponseEntity<Integer> getDailyRevenue() {
-	          return ResponseEntity.ok(paymentService.getDailyRevenue());
-	      }
+//	      @GetMapping("/weekly")
+//	      public ResponseEntity<Integer> getWeeklyRevenue() {
+//	          return ResponseEntity.ok(paymentService.getWeeklyRevenue());
+//	      }
+
+	      
+
+//	      @GetMapping("/yearly")
+//	      public ResponseEntity<Integer> getYearlyRevenue() {
+//	          return ResponseEntity.ok(paymentService.getYearlyRevenue());
+//	      }
+//	      
+//	      @GetMapping("/daily")
+//	      public ResponseEntity<Integer> getDailyRevenue() {
+//	          return ResponseEntity.ok(paymentService.getDailyRevenue());
+//	      }
 }

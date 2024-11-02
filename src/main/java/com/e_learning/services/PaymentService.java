@@ -1,6 +1,7 @@
 package com.e_learning.services;
 
 import java.util.List;
+import java.util.Map;
 
 import com.e_learning.payloads.CategoryDto;
 import com.e_learning.payloads.PaymentDto;
@@ -27,12 +28,17 @@ public interface PaymentService {
 			//Update 
 			PaymentDto updatePayment(PaymentDto paymentDto, Integer paymentId);
 
-			Integer getWeeklyRevenue();
+			//Integer getMonthlyRevenue();
+			
+			Map<String, Integer> getMonthlyRevenues();
 
-			Integer getMonthlyRevenue();
+			
+		//	Integer getWeeklyRevenue();
 
-			Integer getYearlyRevenue();
+			
 
-			Integer getDailyRevenue();
+//			Integer getYearlyRevenue();
+//
+//			Integer getDailyRevenue();
 
 }

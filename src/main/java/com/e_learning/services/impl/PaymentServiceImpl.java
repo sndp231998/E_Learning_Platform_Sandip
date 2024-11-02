@@ -6,7 +6,9 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -131,13 +133,13 @@ public class PaymentServiceImpl implements PaymentService {
         
         
         
-        String welcomeMessage = String.format("Welcome, %s! We're excited to have you on our eLearning platform. Dive in and enjoy the journey ahead! "
-        		+ "Thank you for choosing us, Utkrista Shikshya", user.getName());
         
+        // Create a notification message for the pending payment
+        String notificationMessage = String.format("Payment is pending approval and will be processed soon. Total amount: %d.", totalPrice);
 
-     // Create in-app notification
-        notificationService.createNotification(user.getId(), welcomeMessage);
-        
+        // Send notification
+        notificationService.createNotification(user.getId(), notificationMessage);
+
         return modelMapper.map(newPayment, PaymentDto.class);
         
        
@@ -229,7 +231,15 @@ public class PaymentServiceImpl implements PaymentService {
         logger.info("Updated Faculties after adding categories for userId {}: {}", user.getId(), user.getFacult());
 
         userRepo.save(user);  // Save the user with the updated faculties
+        
+        // Create a notification message for the pending payment
+        String notificationMessage = String.format("Payment is approved." );
 
+        
+        notificationService.createNotification(user.getId(), notificationMessage);
+
+      
+        
         return modelMapper.map(payment, PaymentDto.class);
     }
 
@@ -248,6 +258,14 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(PaymentStatus.REJECTED);
         paymentRepo.save(payment);
 
+        User user=payment.getUser();
+        // Create a notification message for the pending payment
+        String notificationMessage = String.format("Payment is Rejected." );
+
+        
+        notificationService.createNotification(user.getId(), notificationMessage);
+
+      
         return modelMapper.map(payment, PaymentDto.class);
     }
 
@@ -274,32 +292,56 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepo.findByUserAndCategory(user, category).isPresent();
     }
 
-
+    
+//    @Override
+//    public Integer getMonthlyRevenue() {
+//        LocalDateTime startOfMonth = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).truncatedTo(ChronoUnit.DAYS);
+//        LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+//        return paymentRepo.calculateTotalRevenue(startOfMonth, endOfMonth);
+//    }
+    
     @Override
-    public Integer getWeeklyRevenue() {
-        LocalDateTime startOfWeek = LocalDateTime.now().with(java.time.DayOfWeek.MONDAY).truncatedTo(ChronoUnit.DAYS);
-        LocalDateTime endOfWeek = startOfWeek.plusWeeks(1);
-        return paymentRepo.calculateTotalRevenue(startOfWeek, endOfWeek);
+    public Map<String, Integer> getMonthlyRevenues() {
+        Map<String, Integer> monthlyRevenues = new LinkedHashMap<>();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfYear = now.withDayOfYear(1).truncatedTo(ChronoUnit.DAYS);
+
+        for (int month = 0; month < now.getMonthValue(); month++) {
+            LocalDateTime startOfMonth = startOfYear.plusMonths(month);
+            LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+
+            Integer monthlyRevenue = paymentRepo.calculateTotalRevenue(startOfMonth, endOfMonth);
+            String monthName = startOfMonth.getMonth().toString(); // Get the month name (e.g., JANUARY)
+
+            monthlyRevenues.put(monthName, monthlyRevenue != null ? monthlyRevenue : 0);
+        }
+        
+        return monthlyRevenues;
     }
 
-    @Override
-    public Integer getMonthlyRevenue() {
-        LocalDateTime startOfMonth = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).truncatedTo(ChronoUnit.DAYS);
-        LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
-        return paymentRepo.calculateTotalRevenue(startOfMonth, endOfMonth);
-    }
+    
 
-    @Override
-    public Integer getYearlyRevenue() {
-        LocalDateTime startOfYear = LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);
-        LocalDateTime endOfYear = startOfYear.plusYears(1);
-        return paymentRepo.calculateTotalRevenue(startOfYear, endOfYear);
-    }
+//    @Override
+//    public Integer getWeeklyRevenue() {
+//        LocalDateTime startOfWeek = LocalDateTime.now().with(java.time.DayOfWeek.MONDAY).truncatedTo(ChronoUnit.DAYS);
+//        LocalDateTime endOfWeek = startOfWeek.plusWeeks(1);
+//        return paymentRepo.calculateTotalRevenue(startOfWeek, endOfWeek);
+//    }
 
-    @Override
-    public Integer getDailyRevenue() {
-        LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);  // Beginning of today
-        LocalDateTime endOfDay = startOfDay.plusDays(1);  // End of today
-        return paymentRepo.calculateTotalRevenue(startOfDay, endOfDay);
-    }
+   
+
+//    @Override
+//    public Integer getYearlyRevenue() {
+//        LocalDateTime startOfYear = LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);
+//        LocalDateTime endOfYear = startOfYear.plusYears(1);
+//        return paymentRepo.calculateTotalRevenue(startOfYear, endOfYear);
+//    }
+
+//    @Override
+//    public Integer getDailyRevenue() {
+//        LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);  // Beginning of today
+//        LocalDateTime endOfDay = startOfDay.plusDays(1);  // End of today
+//        return paymentRepo.calculateTotalRevenue(startOfDay, endOfDay);
+//    }
 }
