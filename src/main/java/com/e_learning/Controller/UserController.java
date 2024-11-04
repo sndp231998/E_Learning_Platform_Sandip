@@ -2,8 +2,10 @@ package com.e_learning.Controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -119,7 +121,24 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 //------Faculty add and update ----
- 
+	 // only Add new without  faculty for a user
+	@PutMapping("/{userId}/faculty")
+	public ResponseEntity<Map<String, Object>> updateUserFaculty(@PathVariable Integer userId, @RequestBody UserDto userDto) {
+	    UserDto updatedUser = userService.updateFacult(userDto, userId);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("updatedUser", updatedUser);
+	    
+	    List<String> alreadyExistingFaculties = userDto.getFacult().stream()
+	            .filter(faculty -> updatedUser.getFacult().contains(faculty))
+	            .collect(Collectors.toList());
+	    if (!alreadyExistingFaculties.isEmpty()) {
+	        response.put("message", "These faculties already exist: " + alreadyExistingFaculties);
+	    }
+
+	    return ResponseEntity.ok(response);
+	}
+
  // Update Faculty API
 //    @PutMapping("/{userId}/faculty")
 //    public ResponseEntity<UserDto> updateFaculty(

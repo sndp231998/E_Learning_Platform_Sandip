@@ -25,11 +25,15 @@ public class NotificationController {
     }
 
     // Endpoint to get only unread notifications for a user
-//    @GetMapping("/user/{userId}/unread")
-//    public ResponseEntity<List<Notification>> getUnreadNotificationsForUser(@PathVariable Integer userId) {
-//        List<Notification> unreadNotifications = notificationService.getUnreadNotificationsForUser(userId);
-//        return ResponseEntity.ok(unreadNotifications);
-//    }
+ // Endpoint to get only unread notifications for a user
+ // Endpoint to get only unread notifications for a user
+    @GetMapping("/user/{userId}/unread")
+    public ResponseEntity<List<Notification>> getUnreadNotificationsForUser(@PathVariable Integer userId) {
+        List<Notification> unreadNotifications = notificationService.getUnreadNotificationsForUser(userId);
+        return ResponseEntity.ok(unreadNotifications);
+    }
+
+
 
     // Endpoint to mark all notifications as read for a user
     @PostMapping("/user/{userId}/mark-read")

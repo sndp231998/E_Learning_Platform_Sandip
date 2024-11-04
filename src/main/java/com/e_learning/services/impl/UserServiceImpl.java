@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import com.e_learning.entities.OtpRequest;
 import com.e_learning.entities.Payment;
 import com.e_learning.entities.Role;
 import com.e_learning.entities.User;
+import com.e_learning.exceptions.ApiException;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.UserDto;
 import com.e_learning.repositories.CategoryRepo;
@@ -63,10 +65,66 @@ public class UserServiceImpl implements UserService {
 
    // @Autowired
    // private NotificationService notificationService;
-
+@Autowired
     private CategoryRepo categoryRepo;
     @Autowired
 private OtpRequestService sendmsg;
+    
+    
+    
+    
+    //---------------update-Facult-------------------
+    @Override
+    public UserDto updateFacult(UserDto userDto, Integer userId) {
+        User user = this.userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        List<String> currentFacult = user.getFacult();
+        List<String> newFacult = userDto.getFacult();
+
+        // Fetch all valid category titles
+        List<String> validCategories = categoryRepo.findAll()
+                .stream()
+                .map(category -> category.getCategoryTitle())
+                .collect(Collectors.toList());
+
+        List<String> alreadyExistingFaculties = new ArrayList<>();
+        List<String> invalidFaculties = new ArrayList<>();
+
+        for (String faculty : newFacult) {
+            if (!validCategories.contains(faculty)) {
+               
+            	 throw new ApiException("Invalid faculty: '" + faculty + "' does not match any category title.");
+               
+            }
+
+            if (currentFacult.contains(faculty)) {
+            	throw new ApiException("Faculty '" + faculty + "' already exists for user.");
+            	
+            } else {
+                // Add new valid faculty to user's list
+                currentFacult.add(faculty);
+            }
+        }
+
+        // Update user's faculty list
+        user.setFacult(currentFacult);
+        User updatedUser = this.userRepo.save(user);
+
+        // Log existing and invalid faculties
+        if (!alreadyExistingFaculties.isEmpty()) {
+            logger.info("These faculties already exist for user {}: {}", userId, alreadyExistingFaculties);
+        }
+        if (!invalidFaculties.isEmpty()) {
+            logger.info("These faculties are invalid and were not added: {}", invalidFaculties);
+        }
+
+        return this.userToDto(updatedUser);
+    }
+
+    
+    
+    
     
     @Override
     public UserDto registerNewUser(UserDto userDto) {
@@ -303,16 +361,7 @@ private OtpRequestService sendmsg;
 //        return this.userToDto(updatedUser);
 //    }
     
-    //---------------update-Facult-------------------
-    @Override
-    public UserDto updateFacult(UserDto userDto,Integer userId) {
-    	 User user = this.userRepo.findById(userId)
-                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-         user.setFacult(userDto.getFacult());
-         logger.info("Faculty from service "+userDto.getFacult());
-         User updatedUser = this.userRepo.save(user);
-         return this.userToDto(updatedUser);
-    }
+
     //----------update discount only-------------
     @Override
     public UserDto updateDiscount(UserDto userDto, Integer userId) {
