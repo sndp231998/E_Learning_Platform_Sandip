@@ -1,6 +1,8 @@
 package com.e_learning.entities;
 import javax.persistence.*;
 import javax.validation.constraints.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
@@ -55,6 +57,9 @@ public class User implements UserDetails {
     @Column(name = "date_of_registration")
     private LocalDateTime dateOfRegistration;
 
+    private LocalDateTime trialExpiryDate;
+    
+	private boolean trialtaken=false;
 	
 	private String imageName;
     private String collegename;
@@ -110,6 +115,8 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+	
     
     
 }

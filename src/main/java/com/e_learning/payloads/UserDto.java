@@ -27,7 +27,8 @@ public class UserDto {
 
 	private String name;
 
-
+	private LocalDateTime trialExpiryDate;
+	
 	private String email;
 	
 	private LocalDateTime dateOfRegistration;

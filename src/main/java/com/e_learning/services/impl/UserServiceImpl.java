@@ -1,6 +1,7 @@
 package com.e_learning.services.impl;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -70,7 +71,61 @@ public class UserServiceImpl implements UserService {
     @Autowired
 private OtpRequestService sendmsg;
     
-    
+    @Override
+    public UserDto startTrialForNewUser(Integer userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        // Set trial role
+        Role trialRole = roleRepo.findById(AppConstants.SUBSCRIBED_USER)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Id", AppConstants.SUBSCRIBED_USER));
+     // Check if the user is still on a trial or has already completed it
+        if (user.getTrialExpiryDate() != null && LocalDateTime.now().isBefore(user.getTrialExpiryDate())) {
+            throw new RuntimeException("User is already on a trial or has already completed it.");
+        }
+        
+        // Clear existing roles and add the trial role
+        user.getRoles().clear();
+        user.getRoles().add(trialRole);
+        
+        // Assign all category titles as faculties
+        List<String> allCategories = categoryRepo.findAll()
+                .stream()
+                .map(category -> category.getCategoryTitle())
+                .collect(Collectors.toList());
+        user.setFacult(allCategories);
+        
+        // Set trial expiry date to 7 days from now user.setTrialExpiryDate(LocalDate.now().plusDays(7));
+user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
+     User updatedUser=   userRepo.save(user);
+
+        // Log or notify the user
+        logger.info("7-day trial started for user {} with all faculties assigned", userId);
+        return this.userToDto(updatedUser);
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")  // Runs daily at midnight
+    public void expireTrialRoles() {
+        List<User> usersWithTrial = userRepo.findAllByTrialExpiryDateBefore(LocalDateTime.now());
+        
+        for (User user : usersWithTrial) {
+            // Remove trial role and assign normal role
+            Role normalRole = roleRepo.findById(AppConstants.NORMAL_USER)
+                    .orElseThrow(() -> new ResourceNotFoundException("Role", "Id", AppConstants.NORMAL_USER));
+            
+            user.getRoles().clear();
+            user.getRoles().add(normalRole);
+
+            // Clear faculties assigned during the trial
+            user.setFacult(Collections.emptyList());
+            user.setTrialExpiryDate(null);  // Clear trial expiry date
+
+            userRepo.save(user);
+
+            // Notify the user
+            String message = "Your 7-day trial has ended. Access to all faculties has been removed.";
+            notificationService.createNotification(user.getId(), message);
+        }}
     
     
     //---------------update-Facult-------------------

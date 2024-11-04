@@ -54,6 +54,15 @@ public class UserController {
 	 @Autowired
 	    private RateLimitingService rateLimitingService;
 
+	 
+	 
+	 @PutMapping("/{userId}/start-trial")
+	    public ResponseEntity<UserDto> startTrialForNewUser(@PathVariable Integer userId) {
+	        UserDto updatedUser = this.userService.startTrialForNewUser(userId);
+	        return ResponseEntity.ok(updatedUser);
+	    }
+	
+	 
 	// POST-create user
 	 @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
 	@PostMapping("/")

@@ -55,4 +55,6 @@ UserDto registerNewUser(UserDto user);
     List<UserDto> getUsersJoinedInLast7Days();
 
 	void deleteFaculty(Integer userId, String facultyName);
+
+	UserDto startTrialForNewUser(Integer userId);
 }
