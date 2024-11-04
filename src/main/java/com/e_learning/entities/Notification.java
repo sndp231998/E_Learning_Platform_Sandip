@@ -18,7 +18,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
 public class Notification {
 
 	@Id
@@ -33,7 +33,7 @@ public class Notification {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore 
+     
     private User user;
 
     private LocalDateTime createdAt = LocalDateTime.now();

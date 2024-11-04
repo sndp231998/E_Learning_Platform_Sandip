@@ -78,7 +78,19 @@ public class UserController {
 		this.userService.deleteUser(uid);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User deleted Successfully", true), HttpStatus.OK);
 	}
+	@DeleteMapping("{userId}/{facultyName}")
+    public ResponseEntity<ApiResponse> deleteFaculty(@PathVariable Integer userId, @PathVariable String facultyName) {
+      this.userService.deleteFaculty(userId, facultyName);
+      //  return ResponseEntity.noContent().build(); // Return 204 No Content on successful deletion
+      return new ResponseEntity<ApiResponse>(new ApiResponse("Faculty delete successfull",true),HttpStatus.OK);
 
+  	
+	}
+	
+	
+	
+	
+	
 	// GET - user get
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/")
@@ -122,6 +134,7 @@ public class UserController {
     }
 //------Faculty add and update ----
 	 // only Add new without  faculty for a user
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{userId}/faculty")
 	public ResponseEntity<Map<String, Object>> updateUserFaculty(@PathVariable Integer userId, @RequestBody UserDto userDto) {
 	    UserDto updatedUser = userService.updateFacult(userDto, userId);
@@ -135,9 +148,14 @@ public class UserController {
 	    if (!alreadyExistingFaculties.isEmpty()) {
 	        response.put("message", "These faculties already exist: " + alreadyExistingFaculties);
 	    }
-
-	    return ResponseEntity.ok(response);
+	   return ResponseEntity.ok(response);
 	}
+
+	//return new ResponseEntity<ApiResponse>(new ApiResponse("User deleted Successfully", true), HttpStatus.OK);
+
+	
+	
+	//return new ResponseEntity<ApiResponse>(new ApiResponse("Faculty delete successfull",true),HttpStatus.OK);
 
  // Update Faculty API
 //    @PutMapping("/{userId}/faculty")

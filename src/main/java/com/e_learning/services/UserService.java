@@ -53,4 +53,6 @@ UserDto registerNewUser(UserDto user);
     UserDto updateDiscount(UserDto user, Integer userId);
     
     List<UserDto> getUsersJoinedInLast7Days();
+
+	void deleteFaculty(Integer userId, String facultyName);
 }

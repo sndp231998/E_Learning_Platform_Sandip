@@ -2,10 +2,13 @@ package com.e_learning.Controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.e_learning.entities.Notification;
+import com.e_learning.payloads.NotificationDto;
 import com.e_learning.services.NotificationService;
 
 import java.util.List;
@@ -17,6 +20,17 @@ public class NotificationController {
     @Autowired
     private NotificationService notificationService;
 
+    
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<NotificationDto> createNotification(
+            @PathVariable Integer userId, 
+            @RequestBody NotificationDto notificationDto) {
+        
+        NotificationDto createdNotification = notificationService.createNotification(userId, notificationDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdNotification);
+    }
+  
+    
     // Endpoint to get all notifications for a user
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Notification>> getAllNotificationForUser(@PathVariable Integer userId) {

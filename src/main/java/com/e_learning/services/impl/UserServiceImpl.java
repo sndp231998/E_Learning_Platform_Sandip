@@ -79,6 +79,15 @@ private OtpRequestService sendmsg;
         User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
+        // Fetch the NORMAL_USER role
+        Role normalUserRole = this.roleRepo.findById(AppConstants.NORMAL_USER)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Id", AppConstants.NORMAL_USER));
+
+        // Check if user already has the NORMAL_USER role
+        if (user.getRoles().contains(normalUserRole)) {
+            throw new ApiException("Cannot add faculty !!.Please change the role before adding faculty.");
+        }
+        
         List<String> currentFacult = user.getFacult();
         List<String> newFacult = userDto.getFacult();
 
@@ -123,7 +132,33 @@ private OtpRequestService sendmsg;
     }
 
     
-    
+    @Override
+    public void deleteFaculty(Integer userId, String facultyName) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        // Check if facultyName exists in category titles
+        List<String> validCategories = categoryRepo.findAll()
+                .stream()
+                .map(category -> category.getCategoryTitle())
+                .collect(Collectors.toList());
+
+        if (!validCategories.contains(facultyName)) {
+            throw new ApiException("Faculty '" + facultyName + "' does not match any category title.");
+        }
+
+        // Check if the facultyName exists in the user's faculty list
+        List<String> currentFacult = user.getFacult();
+        if (!currentFacult.contains(facultyName)) {
+            throw new ApiException("Faculty '" + facultyName + "' does not exist in the user's faculty list.");
+        }
+
+        // Remove the faculty and save the user
+        currentFacult.remove(facultyName);
+        user.setFacult(currentFacult);
+        userRepo.save(user);
+    }
+
     
     
     @Override

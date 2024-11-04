@@ -3,6 +3,7 @@ package com.e_learning.services;
 import java.util.List;
 
 import com.e_learning.entities.Notification;
+import com.e_learning.payloads.NotificationDto;
 
 public interface NotificationService {
 
@@ -13,4 +14,6 @@ public interface NotificationService {
     void markNotificationsAsRead(Integer userId); // optional if you want read marking
 
 	List<Notification> getAllNotificationsForUser(Integer userId);
+
+	NotificationDto createNotification(Integer userId, NotificationDto notificationDto);
 }

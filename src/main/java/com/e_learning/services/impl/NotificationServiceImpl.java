@@ -2,12 +2,16 @@ package com.e_learning.services.impl;
 
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.e_learning.entities.Answer;
 import com.e_learning.entities.Notification;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ResourceNotFoundException;
+import com.e_learning.payloads.AnswerDto;
+import com.e_learning.payloads.NotificationDto;
 import com.e_learning.repositories.NotificationRepo;
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.NotificationService;
@@ -21,6 +25,27 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Override
+    public NotificationDto createNotification(Integer userId, NotificationDto notificationDto) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        
+        Notification notification = this.modelMapper.map(notificationDto, Notification.class);
+       
+        notification.setUser(user);
+        notification.setMessage(notificationDto.getMessage());
+        Notification not=this.notificationRepo.save(notification);
+        NotificationDto savedAotDto = this.modelMapper.map(not, NotificationDto.class);
+        
+        return savedAotDto;
+    }
+
+    
+    
+    //call from other class
     @Override
     public void createNotification(Integer userId, String message) {
         User user = userRepo.findById(userId)
@@ -30,7 +55,8 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setMessage(message);
         notificationRepo.save(notification);
     }
-
+    
+    
     @Override
     public List<Notification> getUnreadNotificationsForUser(Integer userId) {
         return notificationRepo.findByUserIdAndIsReadFalse(userId);
