@@ -37,7 +37,7 @@ public class UserDto {
 
 	private String collegename;
 	private String imageName;
-	private String faculty;
+	//private String faculty;
 	 private List<String> facult; 
 	 @Column(name = "otp")
    private String otp;

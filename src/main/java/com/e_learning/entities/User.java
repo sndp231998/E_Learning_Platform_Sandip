@@ -63,7 +63,7 @@ public class User implements UserDetails {
 	
 	private String imageName;
     private String collegename;
-   private String faculty;
+  // private String faculty;
     
     @ElementCollection
     @CollectionTable(name = "user_faculty", joinColumns = @JoinColumn(name = "user_id"))

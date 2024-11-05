@@ -18,7 +18,7 @@ public interface LiveStreamingService {
 			
 			List<LiveStreamingDto> getLiveStreamingByCategory(Integer categoryId);
 			
-			List<LiveStreamingDto>getLiveStreamingsByUserFaculty(Integer userId);
+			//List<LiveStreamingDto>getLiveStreamingsByUserFaculty(Integer userId);
 			
 			List<LiveStreamingDto>getLiveStreamingByUserFaculty(Integer userId,String faculty);
 			

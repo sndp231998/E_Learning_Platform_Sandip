@@ -64,12 +64,12 @@ public class LiveStreamingController {
 
 		}
 //		get livestreamings By userFaculty
-		@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
-		 @GetMapping("lives/user/{userId}")
-		    public ResponseEntity<List<LiveStreamingDto>> getLivesByUserFaculty(@PathVariable Integer userId) {
-		        List<LiveStreamingDto> lives = this.liveService.getLiveStreamingsByUserFaculty(userId);
-		        return new ResponseEntity<>(lives, HttpStatus.OK);
-		    }
+//		@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
+//		 @GetMapping("lives/user/{userId}")
+//		    public ResponseEntity<List<LiveStreamingDto>> getLivesByUserFaculty(@PathVariable Integer userId) {
+//		        List<LiveStreamingDto> lives = this.liveService.getLiveStreamingsByUserFaculty(userId);
+//		        return new ResponseEntity<>(lives, HttpStatus.OK);
+//		    }
 		
 		
 		// GET - all live get

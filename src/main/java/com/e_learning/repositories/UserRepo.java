@@ -27,9 +27,9 @@ public interface UserRepo extends JpaRepository<User, Integer>{
 	
 	@Query("SELECT f FROM User u JOIN u.facult f WHERE u.id = :id")
     List<String> findFacultiesByUserId(@Param("id") int id);
-
-@Query("SELECT DISTINCT u.faculty FROM User u")
-List<String> findAllFaculties();
+//
+//@Query("SELECT DISTINCT u.faculty FROM User u")
+//List<String> findAllFaculties();
 
 @Query("SELECT u FROM User u WHERE u.dateOfRegistration >= :sevenDaysAgo")
 List<User> findUsersJoinedInLast7Days(LocalDateTime sevenDaysAgo);

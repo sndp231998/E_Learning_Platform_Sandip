@@ -92,13 +92,13 @@ public class PostController {
 		return new ResponseEntity<List<PostDto>>(posts, HttpStatus.OK);
 
 	}
-//	get Posts By userFaculty
-	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
-	 @GetMapping("posts/user/{userId}")
-	    public ResponseEntity<List<PostDto>> getPostsByUserFaculty(@PathVariable Integer userId) {
-	        List<PostDto> posts = this.postService.getPostsByUserFaculty(userId);
-	        return new ResponseEntity<>(posts, HttpStatus.OK);
-	    }
+////	get Posts By userFaculty
+//	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
+//	 @GetMapping("posts/user/{userId}")
+//	    public ResponseEntity<List<PostDto>> getPostsByUserFaculty(@PathVariable Integer userId) {
+//	        List<PostDto> posts = this.postService.getPostsByUserFaculty(userId);
+//	        return new ResponseEntity<>(posts, HttpStatus.OK);
+//	    }
 	
 //	get Posts By userFaculty
 	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")

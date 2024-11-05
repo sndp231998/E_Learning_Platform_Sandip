@@ -38,7 +38,7 @@ public interface ExamService {
 			//get all exams by user
 			List<ExamDto> getExamsByUser(Integer userId);
 			
-			List<ExamDto>getExamsByUserFaculty(Integer userId);
+			//List<ExamDto>getExamsByUserFaculty(Integer userId);
 			
 			List<ExamDto>getExamsByUserFaculty(Integer userId, String faculty) ;
 			List<ExamDto> searchExams(String keyword);

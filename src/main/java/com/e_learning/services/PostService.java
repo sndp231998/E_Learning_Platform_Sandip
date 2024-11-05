@@ -42,7 +42,7 @@ public interface PostService {
 		
 	
 		
-		List<PostDto>getPostsByUserFaculty(Integer userId);
+		//List<PostDto>getPostsByUserFaculty(Integer userId);
 		
 	//	List<PostDto>getPostssByUserFacult(Integer userId);
 		List<PostDto>getPostssByUserFacult(Integer userId, String faculty) ;

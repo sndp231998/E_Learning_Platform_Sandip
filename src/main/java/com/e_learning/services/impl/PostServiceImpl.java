@@ -176,31 +176,31 @@ public class PostServiceImpl implements PostService {
     }
 
 
-	@Override
-	public List<PostDto> getPostsByUserFaculty(Integer userId) {
-		// Retrieve user by ID
-        User user = this.userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-        
-        // Get the user's faculty
-        String userFaculty = user.getFaculty();
-
-     // Find the category that matches the user's faculty
-        Category category = this.categoryRepo.findByCategoryTitle(userFaculty);
-        if (category == null) {
-            throw new ResourceNotFoundException("Category", "title", userFaculty);
-        }
-        
-     // Fetch posts associated with the category
-        List<Post> posts = this.postRepo.findByCategory(category);
-     // Convert posts to PostDto
-        List<PostDto> postDtos = posts.stream()
-                                      .map(post -> this.modelMapper.map(post, PostDto.class))
-                                      .collect(Collectors.toList());
-
-        return postDtos;
-
-	}
+//	@Override
+//	public List<PostDto> getPostsByUserFaculty(Integer userId) {
+//		// Retrieve user by ID
+//        User user = this.userRepo.findById(userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+//        
+//        // Get the user's faculty
+//        String userFaculty = user.getFaculty();
+//
+//     // Find the category that matches the user's faculty
+//        Category category = this.categoryRepo.findByCategoryTitle(userFaculty);
+//        if (category == null) {
+//            throw new ResourceNotFoundException("Category", "title", userFaculty);
+//        }
+//        
+//     // Fetch posts associated with the category
+//        List<Post> posts = this.postRepo.findByCategory(category);
+//     // Convert posts to PostDto
+//        List<PostDto> postDtos = posts.stream()
+//                                      .map(post -> this.modelMapper.map(post, PostDto.class))
+//                                      .collect(Collectors.toList());
+//
+//        return postDtos;
+//
+//	}
 	@Override
 	public List<PostDto> getPostssByUserFacult(Integer userId, String faculty) {
 	    // Retrieve user by ID

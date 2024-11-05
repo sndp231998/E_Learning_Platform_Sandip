@@ -103,30 +103,30 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
     
     
     
-    @Override
-    public List<LiveStreamingDto> getLiveStreamingsByUserFaculty(Integer userId) {
-        // Retrieve user by ID
-        User user = this.userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-
-        // Get the user's faculty
-        String userFaculty = user.getFaculty();
-
-        // Find the category that matches the user's faculty
-        Category category = this.categoryRepo.findByCategoryTitle(userFaculty);
-        if (category == null) {
-            throw new ResourceNotFoundException("Category", "title", userFaculty);
-        }
-        // Fetch live streams associated with the category
-        List<LiveStreaming> lives = this.liveRepo.findByCategory(category);
-
-        // Convert live streams to LiveStreamingDto
-        List<LiveStreamingDto> liveDtos = lives.stream()
-                .map(live -> this.modelMapper.map(live, LiveStreamingDto.class))
-                .collect(Collectors.toList());
-
-        return liveDtos;
-    }
+//    @Override
+//    public List<LiveStreamingDto> getLiveStreamingsByUserFaculty(Integer userId) {
+//        // Retrieve user by ID
+//        User user = this.userRepo.findById(userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+//
+//        // Get the user's faculty
+//        String userFaculty = user.getFaculty();
+//
+//        // Find the category that matches the user's faculty
+//        Category category = this.categoryRepo.findByCategoryTitle(userFaculty);
+//        if (category == null) {
+//            throw new ResourceNotFoundException("Category", "title", userFaculty);
+//        }
+//        // Fetch live streams associated with the category
+//        List<LiveStreaming> lives = this.liveRepo.findByCategory(category);
+//
+//        // Convert live streams to LiveStreamingDto
+//        List<LiveStreamingDto> liveDtos = lives.stream()
+//                .map(live -> this.modelMapper.map(live, LiveStreamingDto.class))
+//                .collect(Collectors.toList());
+//
+//        return liveDtos;
+//    }
     @Override
     public List<LiveStreamingDto> getLiveStreamingByCategory(Integer categoryId) {
         Category category = this.categoryRepo.findById(categoryId)

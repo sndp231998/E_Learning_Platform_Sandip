@@ -200,30 +200,30 @@ public class ExamServiceImpl implements ExamService{
         return examDtos;
 	}
 //yo user lai dekhaune
-	@Override
-	public List<ExamDto> getExamsByUserFaculty(Integer userId) {
-		// Retrieve user by ID
-        User user = this.userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-        
-        // Get the user's faculty
-        String userFaculty = user.getFaculty();
-
-     // Find the category that matches the user's faculty
-        Category category = this.categoryRepo.findByCategoryTitle(userFaculty);
-        if (category == null) {
-            throw new ResourceNotFoundException("Category", "title", userFaculty);
-        }
-        
-     // Fetch posts associated with the category
-        List<Exam> exams = this.examRepo.findByCategory(category);
-     // Convert posts to PostDto
-        List<ExamDto> examDtos = exams.stream()
-                                      .map(exam -> this.modelMapper.map(exam, ExamDto.class))
-                                      .collect(Collectors.toList());
-
-        return examDtos;
-	}
+//	@Override
+//	public List<ExamDto> getExamsByUserFaculty(Integer userId) {
+//		// Retrieve user by ID
+//        User user = this.userRepo.findById(userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+//        
+//        // Get the user's faculty
+//        String userFaculty = user.getFacult();
+//
+//     // Find the category that matches the user's faculty
+//        Category category = this.categoryRepo.findByCategoryTitle(userFaculty);
+//        if (category == null) {
+//            throw new ResourceNotFoundException("Category", "title", userFaculty);
+//        }
+//        
+//     // Fetch posts associated with the category
+//        List<Exam> exams = this.examRepo.findByCategory(category);
+//     // Convert posts to PostDto
+//        List<ExamDto> examDtos = exams.stream()
+//                                      .map(exam -> this.modelMapper.map(exam, ExamDto.class))
+//                                      .collect(Collectors.toList());
+//
+//        return examDtos;
+//	}
 
 	@Override
 	public List<ExamDto> searchExams(String keyword) {

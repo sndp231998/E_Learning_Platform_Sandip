@@ -160,31 +160,7 @@ public class UserController {
 	   return ResponseEntity.ok(response);
 	}
 
-	//return new ResponseEntity<ApiResponse>(new ApiResponse("User deleted Successfully", true), HttpStatus.OK);
 
-	
-	
-	//return new ResponseEntity<ApiResponse>(new ApiResponse("Faculty delete successfull",true),HttpStatus.OK);
-
- // Update Faculty API
-//    @PutMapping("/{userId}/faculty")
-//    public ResponseEntity<UserDto> updateFaculty(
-//            @PathVariable Integer userId, 
-//            @RequestParam String faculty) {
-//        UserDto updatedUser = userService.updateFaculty(userId, faculty);
-//        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-//    }
-
- 
-//    // Update Discount API
-//    @PutMapping("/{userId}/discount")
-//    public ResponseEntity<UserDto> updateDiscount(
-//            @PathVariable Integer userId, 
-//            @RequestParam String discount) {
-//        UserDto updatedUser = userService.updateDiscount(userId, discount);
-//        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-//    }
-	
 	
 	//@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{userId}/discount")
@@ -195,13 +171,7 @@ public class UserController {
 		return ResponseEntity.ok(updatedDiscount);
 	}
 	
-//	@PutMapping("/{userId}/faculty")
-//	public ResponseEntity<UserDto> updateFaculty(@Valid @RequestBody UserDto userDto, @PathVariable("userId") Integer uid) {
-//		UserDto updatedfaculty = this.userService.updateFaculty(userDto, uid);
-//		String a=userDto.getFaculty();
-//		logger.info("faculty form controller ..........................."+a);
-//		return ResponseEntity.ok(updatedfaculty);
-//	}
+
 	
 	//-------------Image upload-------------------
 	// Post method for file upload
@@ -235,11 +205,7 @@ public class UserController {
             StreamUtils.copy(resource, response.getOutputStream());
         }
     }
-//        InputStream resource = this.fileService.getResource(path, imageName);
-//        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-//        StreamUtils.copy(resource,response.getOutputStream())   ;
-//
-//    }
+
 
     @GetMapping("/{userId}/faculties")
     public ResponseEntity<List<String>> getFacultiesByUserId(@PathVariable int userId) {

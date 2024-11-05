@@ -86,12 +86,12 @@ public class ExamController {
 	}
 	
 	//get Exams By userFaculty
-	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
-	 @GetMapping("exams/user/{userId}")
-	    public ResponseEntity<List<ExamDto>> getExamsByUserFaculty(@PathVariable Integer userId) {
-	        List<ExamDto> exams = this.examService.getExamsByUserFaculty(userId);
-	        return new ResponseEntity<>(exams, HttpStatus.OK);
-	    }
+//	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
+//	 @GetMapping("exams/user/{userId}")
+//	    public ResponseEntity<List<ExamDto>> getExamsByUserFaculty(@PathVariable Integer userId) {
+//	        List<ExamDto> exams = this.examService.getExamsByUserFaculty(userId);
+//	        return new ResponseEntity<>(exams, HttpStatus.OK);
+//	    }
 	
 	//get exams By userFaculty
 	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
