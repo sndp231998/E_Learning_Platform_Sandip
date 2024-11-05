@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.e_learning.entities.Category;
 import com.e_learning.entities.Exam;
+import com.e_learning.entities.LiveStreaming;
 import com.e_learning.entities.Post;
 import com.e_learning.entities.Exam.ExamType;
 import com.e_learning.entities.User;
@@ -77,10 +78,36 @@ public class ExamServiceImpl implements ExamService{
 
 	        Exam newExam = this.examRepo.save(exam);
 
+	        notifyUsersAboutExam(category.getCategoryTitle(), newExam);
 	        return this.modelMapper.map(newExam, ExamDto.class);
 	    }
 
+	    private void notifyUsersAboutExam(String categoryTitle, Exam newExam) {
+	        List<User> users = userRepo.findByFaculty(categoryTitle);
 
+	        for (User matchedUser : users) {
+	            String message;
+	            if (newExam.getExamType() == ExamType.ASSIGNMENT) {
+	                message = String.format(
+	                        "New Assignment titled '%s' has started in your faculty category '%s'. Join now! Deadline: %s",
+	                        newExam.getTitle(),
+	                        categoryTitle,
+	                        newExam.getDeadline()
+	                );
+	            } else {
+	                message = String.format(
+	                        "New titled '%s' has started in your faculty category '%s'. Join now! Starting Time: '%s' and Ending Time: %s",
+	                        newExam.getTitle(),
+	                        categoryTitle,
+	                        newExam.getStartTime(),
+	                        newExam.getEndTime()
+	                );
+	            }
+	            notificationService.createNotification(matchedUser.getId(), message);
+	        }
+	    }
+	
+	    
 	
 	@Override
 	public ExamDto updateExam(ExamDto examDto, Integer examId) {
