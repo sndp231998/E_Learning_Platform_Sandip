@@ -144,7 +144,7 @@ public class AnswerController {
  	}
  	
  	//@PreAuthorize("hasRole('ADMIN')")
- 		@PutMapping("/{answerId}/score")
+ 		@PutMapping("answer/{answerId}/score")
  		public ResponseEntity<AnswerDto> updateScore(@Valid @RequestBody AnswerDto answerDto, @PathVariable("answerId") Integer aid) {
  			AnswerDto updatedAnswer = this.answerService.updateScore(answerDto, aid);
  				Double a=	answerDto.getScore();

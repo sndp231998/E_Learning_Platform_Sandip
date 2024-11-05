@@ -1,5 +1,6 @@
 package com.e_learning.services.impl;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,9 +21,12 @@ import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.LiveStreamingRepo;
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.LiveStreamingService;
+import com.e_learning.services.NotificationService;
 
 @Service
 public class LiveStreamingServiceImpl implements LiveStreamingService {
+
+	private static final Logger logger = LoggerFactory.getLogger(LiveStreamingServiceImpl.class);
 
     @Autowired
     private LiveStreamingRepo liveRepo;
@@ -35,10 +39,15 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
 
     @Autowired
     private CategoryRepo categoryRepo;
+    
+    @Autowired
+    private NotificationService notificationService;
+    
 
     @Override
     public LiveStreamingDto createLiveStreaming(LiveStreamingDto liveDto, Integer userId, Integer categoryId) {
-        User user = this.userRepo.findById(userId)
+    	logger.info("Creating live streaming for user ID: {} and category ID: {}", userId, categoryId);
+    	User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "User id", userId));
 
         Category category = this.categoryRepo.findById(categoryId)
@@ -50,28 +59,49 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
         live.setStreamlink(liveDto.getStreamlink());
         live.setUser(user);
         live.setCategory(category);
-
+        
         LiveStreaming newLive = this.liveRepo.save(live);
 
+        logger.info("Live streaming created successfully with ID: {}", newLive.getLiveId());
+        
+        notifyUsersAboutLiveStreaming(category.getCategoryTitle(), newLive); 
+        
         return this.modelMapper.map(newLive, LiveStreamingDto.class);
     }
 
-    @Override
-    public List<LiveStreamingDto> getLiveStreamingByCategory(Integer categoryId) {
-        Category category = this.categoryRepo.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
+ // New method to notify users based on the live streaming category
+    private void notifyUsersAboutLiveStreaming(String categoryTitle, LiveStreaming newLive) {
+        logger.info("Notifying users about new live streaming in category: {}", categoryTitle);
+        
+       
+        List<User> users = userRepo.findByFaculty(categoryTitle);
+        
+        if (users.isEmpty()) {
+            logger.warn("No users found for category: {}", categoryTitle);
+        }
+        // Log the users that will be notified
+        logger.info("Matched users for category '{}': {}", categoryTitle, 
+                     users.stream().map(User::getId).collect(Collectors.toList()));
+        
+        
+        for (User matchedUser : users) {
+            String message = String.format(
+                    "New live streaming titled '%s' has started in your faculty category '%s'. Join now! Starting time: %s",
+                    newLive.getTitle(), 
+                    categoryTitle,
+                    newLive.getStartingTime()
+            );
 
-        List<LiveStreaming> lives = this.liveRepo.findByCategory(category);
- if(lives.isEmpty()) {
-	 throw new ResourceNotFoundException("live streaming","category id",categoryId);
- }
-        List<LiveStreamingDto> liveDtos = lives.stream()
-                .map(live -> this.modelMapper.map(live, LiveStreamingDto.class))
-                .collect(Collectors.toList());
-
-        return liveDtos;
+            notificationService.createNotification(matchedUser.getId(), message);
+            logger.info("Notification sent to user ID: {}", matchedUser.getId());
+        }
     }
 
+    
+    
+    
+    
+    
     
     @Override
     public List<LiveStreamingDto> getLiveStreamingsByUserFaculty(Integer userId) {
@@ -97,6 +127,24 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
 
         return liveDtos;
     }
+    @Override
+    public List<LiveStreamingDto> getLiveStreamingByCategory(Integer categoryId) {
+        Category category = this.categoryRepo.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
+
+        List<LiveStreaming> lives = this.liveRepo.findByCategory(category);
+ if(lives.isEmpty()) {
+	 throw new ResourceNotFoundException("live streaming","category id",categoryId);
+ }
+        List<LiveStreamingDto> liveDtos = lives.stream()
+                .map(live -> this.modelMapper.map(live, LiveStreamingDto.class))
+                .collect(Collectors.toList());
+
+        return liveDtos;
+    }
+
+    
+  
     public LiveStreaming dtoToLiveStreaming(LiveStreamingDto liveStreamingDto) {
         return this.modelMapper.map(liveStreamingDto, LiveStreaming.class);
     }

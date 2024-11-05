@@ -16,4 +16,9 @@ public interface NotificationService {
 	List<NotificationDto> getAllNotificationsForUser(Integer userId);
 
 	NotificationDto createNotification(Integer userId, NotificationDto notificationDto);
+
+
+	void notifyExamScore(Integer userId, String examTitle, double score);
+
+	
 }

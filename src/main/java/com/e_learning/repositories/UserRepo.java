@@ -18,7 +18,11 @@ public interface UserRepo extends JpaRepository<User, Integer>{
 	
 	Optional<User> findByEmail(String email);
 	Optional<User> findByMobileNo(String mobileNo);
+	
+	@Query("SELECT u FROM User u JOIN u.facult f WHERE f = :faculty")
+	List<User> findByFaculty(@Param("faculty") String faculty);
 
+	
 	List<User> findByCollegename(String collegename);
 	
 	@Query("SELECT f FROM User u JOIN u.facult f WHERE u.id = :id")

@@ -23,6 +23,7 @@ import com.e_learning.repositories.ExamRepo;
 
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.ExamService;
+import com.e_learning.services.NotificationService;
 @Service
 public class ExamServiceImpl implements ExamService{
 	 @Autowired
@@ -37,7 +38,9 @@ public class ExamServiceImpl implements ExamService{
 	    @Autowired
 	    private CategoryRepo categoryRepo;
 	      
-	        
+	    @Autowired
+	    private NotificationService notificationService;
+	     
 	    @Override
 	    public ExamDto createExam(ExamDto examDto, Integer userId, Integer categoryId) {
 	        User user = this.userRepo.findById(userId)

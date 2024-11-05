@@ -21,6 +21,7 @@ import com.e_learning.repositories.AnswerRepo;
 import com.e_learning.repositories.ExamRepo;
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.AnswerService;
+import com.e_learning.services.NotificationService;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -36,9 +37,30 @@ public class AnswerServiceImpl implements AnswerService {
     @Autowired
     private ModelMapper modelMapper;
     
-  
+    @Autowired
+    private NotificationService notificationService;
+    
 
-
+    @Override
+    public AnswerDto updateScore(AnswerDto answerDto, Integer answerId) {
+        Answer ans = this.answerRepo.findById(answerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Answer", "Id", answerId));
+        Double oldScore=ans.getScore();
+        ans.setScore(answerDto.getScore());
+       
+        Answer updatedAns = this.answerRepo.save(ans);
+        
+        if(!oldScore.equals(updatedAns.getScore())) {
+        	Integer userId = ans.getUser().getId(); // Get user ID from Answer entity
+            String examTitle = ans.getExam().getTitle(); // Get exam title from Answer entity
+            
+        	
+        	notificationService.notifyExamScore(userId,examTitle,updatedAns.getScore());
+        }
+        return this.modelMapper.map(updatedAns,AnswerDto.class);
+    }
+    
+    
     @Override
     public AnswerDto createAnswer(AnswerDto answerDto, Integer examId, Integer userId) {
         // Fetch the Exam and User entities based on provided IDs
@@ -108,16 +130,7 @@ public class AnswerServiceImpl implements AnswerService {
         return answerDtos;
     }
 
-    @Override
-    public AnswerDto updateScore(AnswerDto answerDto, Integer answerId) {
-        Answer ans = this.answerRepo.findById(answerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Answer", "Id", answerId));
-        
-        ans.setScore(answerDto.getScore());
-       
-        Answer updatedAns = this.answerRepo.save(ans);
-        return this.modelMapper.map(updatedAns,AnswerDto.class);
-    }
+
     
     @Override
     public Double getUserScoreByExam(Integer examId, Integer userId) {
