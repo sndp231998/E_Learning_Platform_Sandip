@@ -26,4 +26,6 @@ public interface AnswerService {
 	List<AnswerDto> getAnswersByExam(Integer examId);
 
 	AnswerDto updateScore(AnswerDto answerDto, Integer answerId);
+
+	Double getUserScoreByExam(Integer examId, Integer userId);
 }

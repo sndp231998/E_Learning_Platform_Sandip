@@ -119,4 +119,12 @@ public class AnswerServiceImpl implements AnswerService {
         return this.modelMapper.map(updatedAns,AnswerDto.class);
     }
     
+    @Override
+    public Double getUserScoreByExam(Integer examId, Integer userId) {
+        Answer answer = answerRepo.findByExamIdAndUserId(examId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Answer", "examId and userId", examId + " & " + userId));
+        
+        return answer.getScore();  // Now returns a Double score
+    }
+
 }

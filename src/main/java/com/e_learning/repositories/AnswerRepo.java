@@ -1,6 +1,7 @@
 package com.e_learning.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +23,8 @@ public interface AnswerRepo extends JpaRepository<Answer, Integer> {
 //	@Query("SELECT a FROM Answer a JOIN a.exam e JOIN e.category c WHERE c.categorytitle = :categoryTitle")
 //    List<Answer> findByExamCategory(@Param("categoryTitle") String categoryTitle);
 //	
+	@Query("SELECT a FROM Answer a WHERE a.exam.id = :examId AND a.user.id = :userId")
+	Optional<Answer> findByExamIdAndUserId(Integer examId, Integer userId);
 	 
 
 }

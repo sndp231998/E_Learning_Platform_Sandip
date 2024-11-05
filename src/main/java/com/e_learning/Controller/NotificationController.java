@@ -65,9 +65,9 @@ public class NotificationController {
     
  // Endpoint to get all notifications for a user, including read and unread
     @GetMapping("/user/{userId}/all")
-    public ResponseEntity<List<Notification>> getAllNotificationsForUser(@PathVariable Integer userId) {
-        List<Notification> notifications = notificationService.getAllNotificationsForUser(userId);
-        return ResponseEntity.ok(notifications);
+    public ResponseEntity<List<NotificationDto>> getAllNotificationsForUser(@PathVariable Integer userId) {
+    	 List<NotificationDto> allNotifications = notificationService.getAllNotificationsForUser(userId);
+         return new ResponseEntity<>(allNotifications, HttpStatus.OK);
     }
 
 }

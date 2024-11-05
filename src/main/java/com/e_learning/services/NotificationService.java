@@ -13,7 +13,7 @@ public interface NotificationService {
     
     void markNotificationsAsRead(Integer userId); // optional if you want read marking
 
-	List<Notification> getAllNotificationsForUser(Integer userId);
+	List<NotificationDto> getAllNotificationsForUser(Integer userId);
 
 	NotificationDto createNotification(Integer userId, NotificationDto notificationDto);
 }

@@ -1,6 +1,7 @@
 package com.e_learning.services.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,10 +72,13 @@ public class NotificationServiceImpl implements NotificationService {
 
 
    
-	@Override
-	public List<Notification> getAllNotificationsForUser(Integer userId) {
-	    return notificationRepo.findByUserId(userId); // Gets both read and unread notifications
-	}
+    @Override
+    public List<NotificationDto> getAllNotificationsForUser(Integer userId) {
+        return notificationRepo.findByUserId(userId)
+                .stream()
+                .map(notification -> modelMapper.map(notification, NotificationDto.class))
+                .collect(Collectors.toList());
+    }
 
     
 }

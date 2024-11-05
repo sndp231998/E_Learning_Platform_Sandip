@@ -153,4 +153,13 @@ public class AnswerController {
  			return ResponseEntity.ok(updatedAnswer);
  		}
   
+ 	// Get score of a user for a specific exam
+ 	    @GetMapping("/exam/{examId}/user/{userId}/score")
+ 	    public ResponseEntity<Double> getUserScoreByExam(
+ 	            @PathVariable Integer examId, 
+ 	            @PathVariable Integer userId) {
+ 	        
+ 	        Double score = answerService.getUserScoreByExam(examId, userId);
+ 	        return ResponseEntity.ok(score); // Now returns Double in the response
+ 	    }
 }
