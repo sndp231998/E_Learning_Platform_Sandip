@@ -57,8 +57,8 @@ public class ForgetPasswordServiceImpl implements ForgetPasswordService {
             otpRequest.setMobileNo(mobileNo);
             String otp = generateOtp(); // Generate OTP
             otpRequest.setOtp(otp); // Set generated OTP
-            otpRequestService.createOtp(otpRequest);  // Save OTP request
-            
+           // otpRequestService.createOtp(otpRequest);  // Save OTP request
+            otpRequestService.SendOtpp(otpRequest, mobileNo);
             
 //            Dear fname, OTP for your password reset is XXXXXX. Kindly do not share OTP.
 //            Thank you for choosing us!
@@ -197,4 +197,3 @@ public class ForgetPasswordServiceImpl implements ForgetPasswordService {
 //otpReq.setOtpValidUntil(otpValidUntil); // OTP valid for 10 minutes
 //Instant otpInstant = otpGenerationTime.atZone(ZoneId.systemDefault()).toInstant();
 //Instant currentInstant = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
-

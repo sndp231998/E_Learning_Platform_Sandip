@@ -106,8 +106,22 @@ public class OtpRequestServiceImpl implements OtpRequestService {
         return otpRequestRepo.save(otpReq);
     }
 
-
-
+@Override
+    public OtpRequest SendOtpp(OtpRequest otpReq, String phnumber) {
+    	Optional<User> mobileExists = userRepo.findByMobileNo(phnumber);
+    	if (mobileExists.isPresent()) {
+           
+        
+        String ph = otpReq.getMobileNo();
+        String otp = generateOtp();
+        otpReq.setOtp(otp);
+        sendOtpSms(ph, otp);
+        Instant otpValidUntilInstant = Instant.now().plus(10, ChronoUnit.MINUTES);
+        LocalDateTime otpValidUntil = LocalDateTime.ofInstant(otpValidUntilInstant, ZoneId.systemDefault());
+        otpReq.setOtpValidUntil(otpValidUntil); // OTP valid for 10 minutes
+    	}
+        return otpRequestRepo.save(otpReq);
+    }
 	
 
 }

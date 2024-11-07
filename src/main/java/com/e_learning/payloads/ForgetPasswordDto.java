@@ -28,5 +28,5 @@ public class ForgetPasswordDto {
 	private String otp;
 	private String newPassword;
 
-	    private User user;
+	    private UserDto user;
 }

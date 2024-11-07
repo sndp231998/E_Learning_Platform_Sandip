@@ -61,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
 		cat.setCategoryDescription(categoryDto.getCategoryDescription());
          cat.setPrice(categoryDto.getPrice());
          cat.setAddedDate(LocalDateTime.now());
-         
+         cat.setVideoLink(categoryDto.getVideoLink());
          cat.setCategoryType(categoryDto.getCategoryType());
          logger.info("Category type..... "+categoryDto.getCategoryType());
          cat.setImageName(categoryDto.getImageName());

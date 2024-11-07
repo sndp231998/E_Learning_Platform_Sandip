@@ -49,6 +49,8 @@ public class Category {
 	
 	private String imageName;
 	
+	private String videoLink;
+	
 	@NotBlank(message = "cource type  is required")
 	private String categoryType;
 	

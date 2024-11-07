@@ -23,4 +23,5 @@ public class CategoryDto {
     private String categoryDescription;
     private String imageName;
     private LocalDateTime courseValidDate;
+    private String videoLink;
 }
