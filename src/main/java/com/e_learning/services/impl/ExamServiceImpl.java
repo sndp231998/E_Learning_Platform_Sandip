@@ -1,32 +1,45 @@
 package com.e_learning.services.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import com.e_learning.config.AppConstants;
 import com.e_learning.entities.Category;
 import com.e_learning.entities.Exam;
 import com.e_learning.entities.LiveStreaming;
 import com.e_learning.entities.Post;
+import com.e_learning.entities.Role;
 import com.e_learning.entities.Exam.ExamType;
 import com.e_learning.entities.User;
+import com.e_learning.exceptions.ApiException;
 import com.e_learning.exceptions.ResourceNotFoundException;
 
 import com.e_learning.payloads.ExamDto;
 import com.e_learning.payloads.PostDto;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.ExamRepo;
-
+import com.e_learning.repositories.RoleRepo;
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.ExamService;
 import com.e_learning.services.NotificationService;
+
+import io.lettuce.core.dynamic.annotation.Param;
 @Service
 public class ExamServiceImpl implements ExamService{
+	
+	 private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+	 
 	 @Autowired
 	    private ExamRepo examRepo;
 
@@ -37,39 +50,89 @@ public class ExamServiceImpl implements ExamService{
 	    private UserRepo userRepo;
 
 	    @Autowired
+	    private RoleRepo roleRepo;
+	    @Autowired
 	    private CategoryRepo categoryRepo;
 	      
 	    @Autowired
 	    private NotificationService notificationService;
 	     
-	    @Override
+	    @Override 
 	    public ExamDto createExam(ExamDto examDto, Integer userId, Integer categoryId) {
 	        User user = this.userRepo.findById(userId)
 	                .orElseThrow(() -> new ResourceNotFoundException("User", "User id", userId));
+	        
+	        List<String> faculties = userRepo.findFacultiesByUserId(userId);
+	        
+	        Set<Role> userRoles = user.getRoles(); // Using Set<Role> for role comparison
 
+	        // Define the roles for comparison
+	        Role teacherRole = this.roleRepo.findById(AppConstants.TEACHER_USER)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.TEACHER_USER));
+	        
+	        Role adminRole = this.roleRepo.findById(AppConstants.ADMIN_USER)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.ADMIN_USER));
+	        
+	        Role normalRole = this.roleRepo.findById(AppConstants.NORMAL_USER)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.NORMAL_USER));
+	        
+	        Role subscribeRole = this.roleRepo.findById(AppConstants.SUBSCRIBED_USER)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.SUBSCRIBED_USER));
+	        
 	        Category category = this.categoryRepo.findById(categoryId)
 	                .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
+	        
+	        // Logging user faculty and category title
+	        logger.info("User Faculty: " + faculties);
+	        logger.info("Category Title: " + category.getCategoryTitle());
 
+	        // Role-based permissions
+	        if (userRoles.contains(normalRole) || userRoles.contains(subscribeRole)) {
+	            throw new ApiException("Only teachers and admins are allowed to create exams.");
+	        } 
+	        
+	        // Check if the user is a teacher and needs to match category title with faculty
+	        if (userRoles.contains(teacherRole)) {
+	            String normalizedCategoryTitle = category.getCategoryTitle().trim().toLowerCase();
+	            
+	            // Check if faculties contain the normalized category title
+	            boolean hasPermission = faculties.stream()
+	                    .map(faculty -> faculty.trim().toLowerCase())
+	                    .anyMatch(faculty -> faculty.equals(normalizedCategoryTitle));
+	            
+	            if (!hasPermission) {
+	                throw new ApiException("You do not have permission to create exams in this category.");
+	            }
+	        }
+	        
+	        // If the user is an admin, allow without further checks
+	        if (userRoles.contains(adminRole)) {
+	            // Admin has permission, so no further checks needed
+	        } else if (!userRoles.contains(teacherRole)) {
+	            // Restrict access if the role is neither Admin nor Teacher
+	            throw new ApiException("You do not have permission to create exams.");
+	        }
+	        
+	        // Proceed with exam creation
 	        Exam exam = this.modelMapper.map(examDto, Exam.class);
 	        exam.setImageName("");
 	        exam.setAddedDate(LocalDateTime.now());
 	        exam.setUser(user);
 	        exam.setCategory(category);
 
-	        // Check examType using enum comparison
+	        // Check examType and set the appropriate fields
 	        if (examDto.getExamType() == ExamType.ASSIGNMENT) {
-	        	if(examDto.getDeadline()==null) {
-	        		throw new IllegalArgumentException("DeadLine is required  for Assignment Exam type");
-	        	}
+	            if (examDto.getDeadline() == null) {
+	                throw new IllegalArgumentException("Deadline is required for Assignment Exam type");
+	            }
 	            exam.setDeadline(examDto.getDeadline());
 	            exam.setStartTime(null);
 	            exam.setEndTime(null);
 	        } else if (examDto.getExamType() == ExamType.EXAM || examDto.getExamType() == ExamType.TEST) {
-	           if(examDto.getStartTime()==null ||examDto.getEndTime()==null) {
-	         throw new IllegalArgumentException("Starting time and endTime are required for EXAM/TEST exam type");
-	           
-	           }
-	        	exam.setStartTime(examDto.getStartTime());
+	            if (examDto.getStartTime() == null || examDto.getEndTime() == null) {
+	                throw new IllegalArgumentException("Starting time and end time are required for EXAM/TEST exam type");
+	            }
+	            exam.setStartTime(examDto.getStartTime());
 	            exam.setEndTime(examDto.getEndTime());
 	            exam.setDeadline(null);
 	        } else {
@@ -78,9 +141,14 @@ public class ExamServiceImpl implements ExamService{
 
 	        Exam newExam = this.examRepo.save(exam);
 
+	        // Notify users about the new exam
 	        notifyUsersAboutExam(category.getCategoryTitle(), newExam);
 	        return this.modelMapper.map(newExam, ExamDto.class);
 	    }
+
+	    
+	    
+	    
 
 	    private void notifyUsersAboutExam(String categoryTitle, Exam newExam) {
 	        List<User> users = userRepo.findByFaculty(categoryTitle);
@@ -134,24 +202,7 @@ public class ExamServiceImpl implements ExamService{
 	}
 
 
-//	@Override
-//	public ExamDto updateExam(ExamDto examDto, Integer examId) {
-//		Exam exam = this.examRepo.findById(examId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Examt ", "exam id", examId));
-//
-//        Category category = this.categoryRepo.findById(examDto.getCategory().getCategoryId()).get();
-//
-//        exam.setTitle(examDto.getTitle());
-//        exam.setDeadline(examDto.getDeadline());
-//        exam.setImageName(examDto.getImageName());
-//        exam.setCategory(category);
-//
-//
-//        Exam updatedexam = this.examRepo.save(exam);
-//        return this.modelMapper.map(updatedexam, ExamDto.class);
-//    }
 
-	
 
 	@Override
 	public void deleteExam(Integer examId) {
@@ -199,31 +250,7 @@ public class ExamServiceImpl implements ExamService{
 
         return examDtos;
 	}
-//yo user lai dekhaune
-//	@Override
-//	public List<ExamDto> getExamsByUserFaculty(Integer userId) {
-//		// Retrieve user by ID
-//        User user = this.userRepo.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-//        
-//        // Get the user's faculty
-//        String userFaculty = user.getFacult();
-//
-//     // Find the category that matches the user's faculty
-//        Category category = this.categoryRepo.findByCategoryTitle(userFaculty);
-//        if (category == null) {
-//            throw new ResourceNotFoundException("Category", "title", userFaculty);
-//        }
-//        
-//     // Fetch posts associated with the category
-//        List<Exam> exams = this.examRepo.findByCategory(category);
-//     // Convert posts to PostDto
-//        List<ExamDto> examDtos = exams.stream()
-//                                      .map(exam -> this.modelMapper.map(exam, ExamDto.class))
-//                                      .collect(Collectors.toList());
-//
-//        return examDtos;
-//	}
+
 
 	@Override
 	public List<ExamDto> searchExams(String keyword) {
@@ -242,15 +269,7 @@ public class ExamServiceImpl implements ExamService{
 		return examDtos;
 	}
 
-//	@Override
-//	public List<PostDto> getPostssByUserFacult(Integer userId, String faculty) {
-   
 
-//
-
-//	    
-
-//	}
 
 	@Override
 	public List<ExamDto> getExamsByUserFaculty(Integer userId, String faculty) {

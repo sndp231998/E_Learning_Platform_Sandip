@@ -215,6 +215,25 @@ user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
     }
 
     
+    @Override
+    public void addRoleToUser(String email, String roleName) {
+        // Fetch user by email, throw exception if not found
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+        // Fetch role by name, throw exception if not found
+        Role role = roleRepo.findByName(roleName)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName));
+
+        // Clear existing roles and assign new role
+        user.getRoles().clear();  // Clear all existing roles
+        user.getRoles().add(role);  // Assign new role
+        user.setDate_Of_Role_Changed(LocalDateTime.now());  // Update role change date
+        
+        // Save updated user
+        userRepo.save(user);
+        System.out.println("User role changed to " + roleName + ".");
+    }
     
     @Override
     public UserDto registerNewUser(UserDto userDto) {
@@ -278,7 +297,7 @@ user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
     
     
     
-    
+  
   
     //--------------------------forget password----------------
     //--------------------------get otp from user --------
@@ -399,25 +418,7 @@ user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
         return users.stream().map(user -> modelMapper.map(user, UserDto.class)).collect(Collectors.toList());
     }
 
-    @Override
-    public void addRoleToUser(String email, String roleName) {
-        // Fetch user by email, throw exception if not found
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
-
-        // Fetch role by name, throw exception if not found
-        Role role = roleRepo.findByName(roleName)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName));
-
-        // Clear existing roles and assign new role
-        user.getRoles().clear();  // Clear all existing roles
-        user.getRoles().add(role);  // Assign new role
-        user.setDate_Of_Role_Changed(LocalDateTime.now());  // Update role change date
-        
-        // Save updated user
-        userRepo.save(user);
-        System.out.println("User role changed to " + roleName + ".");
-    }
+  
 
 
     @Override
@@ -492,80 +493,7 @@ user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
                 .collect(Collectors.toList());
     }
 
-   
-  //1800000==30 min
-//  @Override
-//  @Scheduled(fixedRate =120000) // Runs every 2 minutes
-//  public void updateUserRoles() {
-//      logger.info("updateUserRoles method started");
-//      List<User> users = userRepo.findAll();
-//      logger.info("Number of users found: {}", users.size());
-//
-//      for (User user : users) {
-//          if (user.getSubscriptionValidDate() != null) { 
-//              LocalDateTime validDate = user.getSubscriptionValidDate();
-//              logger.info("Processing user: {}, Subscription Valid Date: {}", user.getEmail(), validDate);
-//
-//              for (Role role : user.getRoles()) {
-//                  LocalDateTime roleChangeDate = user.getDate_Of_Role_Changed();
-//                  logger.info("User role: {}, Role Change Date: {}", role.getName(), roleChangeDate);
-//
-//                  // Check if current date is after the valid date
-//                  if (roleChangeDate != null && LocalDateTime.now().isAfter(validDate)) {
-//                      logger.info("Conditions met for user: {}, Role: {}", user.getEmail(), role.getName());
-//
-//                      // Remove old role
-//                      user.getRoles().clear();
-//                      logger.info("Cleared old roles for user: {}", user.getEmail());
-//
-//                      // Add new role
-//                      Role newRole = this.roleRepo.findById(AppConstants.NORMAL_USER)
-//                              .orElseThrow(() -> new ResourceNotFoundException("Role", "id", AppConstants.NORMAL_USER));
-//
-//                      logger.info("Added new role: {} for user: {}", newRole.getName(), user.getEmail());
-//                      user.getRoles().add(newRole);
-//
-//                      // Clear the subscription valid date
-//                      user.setSubscriptionValidDate(null);
-//                      logger.info("Cleared subscription valid date for user: {}", user.getEmail());
-//
-//                      userRepo.save(user);
-//                      logger.info("User roles updated and saved for user: {}", user.getEmail());
-//                  } else {
-//                      logger.info("Conditions not met for user: {}, Role: {}", user.getEmail(), role.getName());
-//                  }
-//              }
-//          } else {
-//              logger.info("User {} does not have a subscription valid date", user.getEmail());
-//          }
-//      }
-//
-//      logger.info("updateUserRoles method completed");
-//  }
-//
-//  @Override
-//  @Scheduled(fixedRate = 86400000) // Runs daily
-//  public void sendSubscriptionExpiryWarnings() {
-//      logger.info("sendSubscriptionExpiryWarnings method started");
-//
-//      List<User> users = userRepo.findAll();
-//      for (User user : users) {
-//          if (user.getSubscriptionValidDate() != null) {
-//              LocalDateTime validDate = user.getSubscriptionValidDate();
-//              LocalDateTime now = LocalDateTime.now();
-//              LocalDateTime warningDate = validDate.minusDays(5);
-//
-//              if (now.isAfter(warningDate) && now.isBefore(validDate)) {
-//                  String message = "Your subscription is ending soon. Please renew your subscription to continue enjoying our services.";
-//                  notificationService.sendNotification(user.getName(), message);
-//                  logger.info("Created warning notification for user: {}, Subscription Valid Date: {}", user.getEmail(), validDate);
-//              }
-//          }
-//      }
-//
-//      logger.info("sendSubscriptionExpiryWarnings method completed");
-//  }
-    
+ 
         
     }
 
