@@ -88,6 +88,8 @@ public class UserController {
 		this.userService.deleteUser(uid);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User deleted Successfully", true), HttpStatus.OK);
 	}
+	
+	 @PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("{userId}/{facultyName}")
     public ResponseEntity<ApiResponse> deleteFaculty(@PathVariable Integer userId, @PathVariable String facultyName) {
       this.userService.deleteFaculty(userId, facultyName);

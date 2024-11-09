@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,7 +50,7 @@ public class CategoryController {
 	@Value("${project.image}")
 	private String path;
 	// create
-
+	 @PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/")
 	public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
 	    CategoryDto createCategory = this.categoryService.createCategory(categoryDto);
@@ -58,7 +59,7 @@ public class CategoryController {
 
 
 	// update
-
+	 @PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{catId}")
 	public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CategoryDto categoryDto,
 			@PathVariable Integer catId) {
@@ -67,7 +68,7 @@ public class CategoryController {
 	}
 
 	// delete
-
+	 @PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{catId}")
 	public ResponseEntity<ApiResponse> deleteCategory(@PathVariable Integer catId) {
 		this.categoryService.deleteCategory(catId);
@@ -119,6 +120,7 @@ public class CategoryController {
     
   //-------------Image upload-------------------
   	// Post method for file upload
+    @PreAuthorize("hasRole('ADMIN')")
       @PostMapping("/file/upload/{categoryId}")
       public ResponseEntity<CategoryDto> uploadCategoryFile(@RequestParam("file") MultipartFile file,
                                                     @PathVariable Integer categoryId) throws IOException {

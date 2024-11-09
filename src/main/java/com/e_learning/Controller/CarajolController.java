@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +45,7 @@ public class CarajolController {
     
     
  // Upload endpoint for new Carajol entry without needing an ID
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload")
     public ResponseEntity<Carajol> uploadCarajolImage(@RequestParam("file") MultipartFile file) throws IOException {
         String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename()).toLowerCase();
@@ -75,6 +77,7 @@ public class CarajolController {
         return new ResponseEntity<>(carajols, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse> deleteCarajolById(@PathVariable("id") Integer id) {
         if (!carajolRepo.existsById(id)) {

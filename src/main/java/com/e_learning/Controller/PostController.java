@@ -53,7 +53,7 @@ public class PostController {
 	private String path;
 	
 //	create
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
 	@PostMapping("/user/{userId}/category/{categoryId}/posts")
 	public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto, @PathVariable Integer userId,
 			@PathVariable Integer categoryId) {
@@ -107,12 +107,7 @@ public class PostController {
 	    return new ResponseEntity<>(posts, HttpStatus.OK);
 	}
 
-//	@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
-//	 @GetMapping("postss/user/{userId}")
-//	    public ResponseEntity<List<PostDto>> getPostssByUserFacult(@PathVariable Integer userId) {
-//	        List<PostDto> posts = this.postService.getPostsByUserFaculty(userId);
-//	        return new ResponseEntity<>(posts, HttpStatus.OK);
-//	    }
+
 	
 	// get all posts
 	//@PreAuthorize("hasRole('ADMIN')")
@@ -146,7 +141,7 @@ public class PostController {
 	}
 
 	// update post
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
 	@PutMapping("/posts/{postId}")
 	public ResponseEntity<PostDto> updatePost(@RequestBody PostDto postDto, @PathVariable Integer postId) {
 

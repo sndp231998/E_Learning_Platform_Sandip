@@ -36,6 +36,7 @@ public class LiveStreamingController {
 	 @Autowired
 	    private RateLimitingService rateLimitingService;
 //	create
+	 @PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
 	@PostMapping("/user/{userId}/category/{categoryId}/lives")
 	public ResponseEntity<LiveStreamingDto> createLiveStreaming(@RequestBody LiveStreamingDto liveDto, @PathVariable Integer userId,
 			@PathVariable Integer categoryId) {
@@ -99,7 +100,7 @@ public class LiveStreamingController {
 		}
 		
 		// delete post
-		@PreAuthorize("hasRole('ADMIN')")
+		@PreAuthorize("hasRole('ADMIN') or hasRole('SUBSCRIBED')")
 		@DeleteMapping("/live/{liveId}")
 		public ApiResponse deleteLive(@PathVariable Integer liveId) {
 			this.liveService.deleteLiveStreaming(liveId);

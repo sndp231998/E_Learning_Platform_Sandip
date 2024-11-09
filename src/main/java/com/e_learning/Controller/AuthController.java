@@ -35,7 +35,7 @@ import com.e_learning.security.JwtTokenHelper;
 import com.e_learning.services.ForgetPasswordService;
 import com.e_learning.services.OtpRequestService;
 import com.e_learning.services.UserService;
-
+import com.e_learning.services.impl.RateLimitingService;
 
 import java.security.Principal;
 
@@ -62,18 +62,22 @@ public class AuthController {
 	private ModelMapper mapper;
 	@Autowired
 	private UserService userService;
+	
+	 @Autowired
+	    private RateLimitingService rateLimitingService;
+	 
 	 @Autowired
 	    private ForgetPasswordService forgetPasswordService;
 
 	// Inject your custom service
-	 @Autowired
-	 private CustomUserDetailService customUserDetailService;
+//	 @Autowired
+//	 private CustomUserDetailService customUserDetailService;
 
 	 
-	 @GetMapping("/chat")
-	    public String showChatPage() {
-	        return "forward:/index.html"; // This will render chat.html from the resources/statics folder
-	    }
+//	 @GetMapping("/chat")
+//	    public String showChatPage() {
+//	        return "forward:/index.html"; // This will render chat.html from the resources/statics folder
+//	    }
 	 
 	 
 	 @PostMapping("/login")
@@ -82,7 +86,7 @@ public class AuthController {
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(request.getUsername());
 			//UserDetails userd=this.userDetailsService.loadUserByUsername(request.getMobilenum());
 			String token = this.jwtTokenHelper.generateToken(userDetails);
-
+			 rateLimitingService.checkRateLimit("test-api-key");
 			JwtAuthResponse response = new JwtAuthResponse();
 			response.setToken(token);
 			response.setUser(this.mapper.map((User) userDetails, UserDto.class));
@@ -109,7 +113,7 @@ public class AuthController {
 	@PostMapping("/register")
 	public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto) {
 		UserDto registeredUser = this.userService.registerNewUser(userDto);
-				
+		rateLimitingService.checkRateLimit("test-api-key");		
 		return new ResponseEntity<UserDto>(registeredUser, HttpStatus.CREATED);
 	}
 
@@ -146,6 +150,7 @@ public class AuthController {
     @PostMapping("/forgetpw")
     public ResponseEntity<ForgetPassword> createForgetPassword(@RequestBody ForgetPasswordDto forgetPasswordDto) {
         ForgetPassword forgetPassword = forgetPasswordService.createForget(forgetPasswordDto);
+        rateLimitingService.checkRateLimit("test-api-key");
         return ResponseEntity.ok(forgetPassword);
     }
 
