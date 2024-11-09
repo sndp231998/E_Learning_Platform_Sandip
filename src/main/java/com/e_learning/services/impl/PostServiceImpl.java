@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,13 +24,16 @@ import org.springframework.stereotype.Service;
 import com.e_learning.config.AppConstants;
 import com.e_learning.entities.Category;
 import com.e_learning.entities.Post;
+import com.e_learning.entities.Role;
 import com.e_learning.entities.User;
+import com.e_learning.exceptions.ApiException;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.ApiResponse;
 import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.PostResponse;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.PostRepo;
+import com.e_learning.repositories.RoleRepo;
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.PostService;
 import com.e_learning.services.UserService;
@@ -51,6 +55,8 @@ public class PostServiceImpl implements PostService {
     private UserRepo userRepo;
 
     @Autowired
+    private RoleRepo roleRepo;
+    @Autowired
     private CategoryRepo categoryRepo;
       
     org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -60,9 +66,53 @@ public class PostServiceImpl implements PostService {
         User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User ", "User id", userId));
 
+        List<String> faculties = userRepo.findFacultiesByUserId(userId);
+        
+        Set<Role> userRoles = user.getRoles(); // Using Set<Role> for role comparison
+
+        // Define the roles for comparison
+        Role teacherRole = this.roleRepo.findById(AppConstants.TEACHER_USER)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.TEACHER_USER));
+        
+        Role adminRole = this.roleRepo.findById(AppConstants.ADMIN_USER)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.ADMIN_USER));
+        
+        Role normalRole = this.roleRepo.findById(AppConstants.NORMAL_USER)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.NORMAL_USER));
+        
+        Role subscribeRole = this.roleRepo.findById(AppConstants.SUBSCRIBED_USER)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.SUBSCRIBED_USER));
+        
         Category category = this.categoryRepo.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "category id ", categoryId));
 
+        // Role-based permissions
+        if (userRoles.contains(normalRole) || userRoles.contains(subscribeRole)) {
+            throw new ApiException("Only teachers and admins are allowed to create.");
+        } 
+        
+        // Check if the user is a teacher and needs to match category title with faculty
+        if (userRoles.contains(teacherRole)) {
+            String normalizedCategoryTitle = category.getCategoryTitle().trim().toLowerCase();
+            
+            // Check if faculties contain the normalized category title
+            boolean hasPermission = faculties.stream()
+                    .map(faculty -> faculty.trim().toLowerCase())
+                    .anyMatch(faculty -> faculty.equals(normalizedCategoryTitle));
+            
+            if (!hasPermission) {
+                throw new ApiException("You do not have permission to create in this category.");
+            }
+        }
+        
+        // If the user is an admin, allow without further checks
+        if (userRoles.contains(adminRole)) {
+            // Admin has permission, so no further checks needed
+        } else if (!userRoles.contains(teacherRole)) {
+            // Restrict access if the role is neither Admin nor Teacher
+            throw new ApiException("You do not have permission to creates.");
+        }
+        
         Post post = this.modelMapper.map(postDto, Post.class);
         post.setImageName("");
         post.setAddedDate(LocalDateTime.now()); 
@@ -176,31 +226,6 @@ public class PostServiceImpl implements PostService {
     }
 
 
-//	@Override
-//	public List<PostDto> getPostsByUserFaculty(Integer userId) {
-//		// Retrieve user by ID
-//        User user = this.userRepo.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-//        
-//        // Get the user's faculty
-//        String userFaculty = user.getFaculty();
-//
-//     // Find the category that matches the user's faculty
-//        Category category = this.categoryRepo.findByCategoryTitle(userFaculty);
-//        if (category == null) {
-//            throw new ResourceNotFoundException("Category", "title", userFaculty);
-//        }
-//        
-//     // Fetch posts associated with the category
-//        List<Post> posts = this.postRepo.findByCategory(category);
-//     // Convert posts to PostDto
-//        List<PostDto> postDtos = posts.stream()
-//                                      .map(post -> this.modelMapper.map(post, PostDto.class))
-//                                      .collect(Collectors.toList());
-//
-//        return postDtos;
-//
-//	}
 	@Override
 	public List<PostDto> getPostssByUserFacult(Integer userId, String faculty) {
 	    // Retrieve user by ID
@@ -232,29 +257,7 @@ public class PostServiceImpl implements PostService {
 	    return postDtos;
 	}
 
-//	@Override
-//	public List<PostDto> getPostssByUserFacult(Integer userId) {
-//		 User user = this.userRepo.findById(userId)
-//	                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-//	        
-//	        // Get the user's faculty
-//	       List<String> userFacult = user.getFacult();
-//	       logger.info("userFacult are"+userFacult);
-//	       // Find the category that matches the user's faculty
-//	        Category category = this.categoryRepo.findByCategoryTitlee(userFacult);
-//	        if (category == null) {
-//	            throw new ResourceNotFoundException("Category", "title", userFacult);
-//	        }
-//
-//	     // Fetch posts associated with the category
-//	        List<Post> posts = this.postRepo.findByCategory(category);
-//	     // Convert posts to PostDto
-//	        List<PostDto> postDtos = posts.stream()
-//	                                      .map(post -> this.modelMapper.map(post, PostDto.class))
-//	                                      .collect(Collectors.toList());
-//
-//	        return postDtos;
-//	}
+
 	
 	@Override
     public List<PostDto> getPostsByCategoryId(Integer categoryId) {

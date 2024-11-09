@@ -29,6 +29,7 @@ import com.e_learning.entities.User;
 import com.e_learning.exceptions.ApiException;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.UserDto;
+import com.e_learning.payloads.UserFacultyDto;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.OtpRequestRepo;
 import com.e_learning.repositories.PaymentRepo;
@@ -494,7 +495,16 @@ user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
     }
 
  
-        
+    public List<UserFacultyDto> getUsersWithTeacherOrSubscribedRoles() {
+        List<User> users = userRepo.findByRolesTeacherOrSubscribed();
+        System.out.println("Fetched Users: " + users.size());
+        users.forEach(user -> System.out.println("User ID: " + user.getId() + ", Facult: " + user.getFacult()));
+
+        return users.stream()
+                    .map(user -> new UserFacultyDto(user.getId(), user.getFacult()))
+                    .collect(Collectors.toList());
+    }
+
     }
 
 	

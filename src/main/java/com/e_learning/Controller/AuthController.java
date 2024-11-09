@@ -24,7 +24,7 @@ import com.e_learning.entities.ForgetPassword;
 import com.e_learning.entities.OtpRequest;
 import com.e_learning.entities.User;
 import com.e_learning.exceptions.ApiException;
-import com.e_learning.exceptions.ResourceNotFoundException;
+
 import com.e_learning.payloads.ForgetPasswordDto;
 import com.e_learning.payloads.JwtAuthRequest;
 import com.e_learning.payloads.JwtAuthResponse;
@@ -36,6 +36,7 @@ import com.e_learning.services.ForgetPasswordService;
 import com.e_learning.services.OtpRequestService;
 import com.e_learning.services.UserService;
 
+
 import java.security.Principal;
 
 
@@ -43,6 +44,7 @@ import java.security.Principal;
 @RequestMapping("/api/v1/auth/")
 public class AuthController {
 
+	
 	  @Autowired
 	    private OtpRequestService otpRequestService;
 	
@@ -86,7 +88,6 @@ public class AuthController {
 			response.setUser(this.mapper.map((User) userDetails, UserDto.class));
 			return new ResponseEntity<JwtAuthResponse>(response, HttpStatus.OK);
 		}
-
 
 
 	

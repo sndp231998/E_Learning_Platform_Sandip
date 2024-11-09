@@ -2,6 +2,7 @@ package com.e_learning.Controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.e_learning.entities.Carajol;
-import com.e_learning.payloads.PostDto;
 import com.e_learning.repositories.CarajolRepo;
 import com.e_learning.services.FileService;
 
@@ -30,26 +30,18 @@ import com.e_learning.services.FileService;
 @RequestMapping("/api/v1/carajol")
 public class CarajolController {
 
-	@Autowired
-	private CarajolRepo carajolRepo;
-	@Autowired
-	private FileService fileService;
+    @Autowired
+    private CarajolRepo carajolRepo;
+    @Autowired
+    private FileService fileService;
 
-	@Value("${project.image}")
-	private String path;
-	
-	
-	 @GetMapping("/all")
-	    public ResponseEntity<List<Carajol>> getAllCarajols() {
-	        List<Carajol> carajols = carajolRepo.findAll();
-	        if (carajols.isEmpty()) {
-	            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	        }
-	        return new ResponseEntity<>(carajols, HttpStatus.OK);
-	    }
-	
-	
-	@PostMapping("/upload")
+    @Value("${project.image}")
+    private String path;
+
+    
+    
+ // Upload endpoint for new Carajol entry without needing an ID
+    @PostMapping("/upload")
     public ResponseEntity<Carajol> uploadCarajolImage(@RequestParam("file") MultipartFile file) throws IOException {
         String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename()).toLowerCase();
 
@@ -68,6 +60,19 @@ public class CarajolController {
 
         return new ResponseEntity<>(savedCarajol, HttpStatus.CREATED);
     }
+
+
+    
+    @GetMapping("/all")
+    public ResponseEntity<List<Carajol>> getAllCarajols() {
+        List<Carajol> carajols = carajolRepo.findAll();
+        if (carajols.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(carajols, HttpStatus.OK);
+    }
+
+
 
     // Method to serve files based on file type
     @GetMapping("/image/{fileName}")
@@ -101,6 +106,3 @@ public class CarajolController {
         }
     }
 }
-	
-
-

@@ -2,23 +2,28 @@ package com.e_learning.services.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.e_learning.config.AppConstants;
 import com.e_learning.entities.Category;
 import com.e_learning.entities.Exam;
 import com.e_learning.entities.LiveStreaming;
 import com.e_learning.entities.Post;
+import com.e_learning.entities.Role;
 import com.e_learning.entities.User;
+import com.e_learning.exceptions.ApiException;
 import com.e_learning.exceptions.ResourceNotFoundException;
 import com.e_learning.payloads.LiveStreamingDto;
 import com.e_learning.payloads.PostDto;
 import com.e_learning.payloads.UserDto;
 import com.e_learning.repositories.CategoryRepo;
 import com.e_learning.repositories.LiveStreamingRepo;
+import com.e_learning.repositories.RoleRepo;
 import com.e_learning.repositories.UserRepo;
 import com.e_learning.services.LiveStreamingService;
 import com.e_learning.services.NotificationService;
@@ -41,6 +46,8 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
     private CategoryRepo categoryRepo;
     
     @Autowired
+    private RoleRepo roleRepo;
+    @Autowired
     private NotificationService notificationService;
     
 
@@ -50,9 +57,54 @@ public class LiveStreamingServiceImpl implements LiveStreamingService {
     	User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "User id", userId));
 
+    	 List<String> faculties = userRepo.findFacultiesByUserId(userId);
+    	 
+    	 
+    	 Set<Role> userRoles = user.getRoles(); // Using Set<Role> for role comparison
+
+	        // Define the roles for comparison
+	        Role teacherRole = this.roleRepo.findById(AppConstants.TEACHER_USER)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.TEACHER_USER));
+	        
+	        Role adminRole = this.roleRepo.findById(AppConstants.ADMIN_USER)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.ADMIN_USER));
+	        
+	        Role normalRole = this.roleRepo.findById(AppConstants.NORMAL_USER)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.NORMAL_USER));
+	        
+	        Role subscribeRole = this.roleRepo.findById(AppConstants.SUBSCRIBED_USER)
+	                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role id", AppConstants.SUBSCRIBED_USER));
+
         Category category = this.categoryRepo.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
 
+        // Role-based permissions
+        if (userRoles.contains(normalRole) || userRoles.contains(subscribeRole)) {
+            throw new ApiException("Only teachers and admins are allowed to create Live Class.");
+        } 
+        
+        // Check if the user is a teacher and needs to match category title with faculty
+        if (userRoles.contains(teacherRole)) {
+            String normalizedCategoryTitle = category.getCategoryTitle().trim().toLowerCase();
+            
+            // Check if faculties contain the normalized category title
+            boolean hasPermission = faculties.stream()
+                    .map(faculty -> faculty.trim().toLowerCase())
+                    .anyMatch(faculty -> faculty.equals(normalizedCategoryTitle));
+            
+            if (!hasPermission) {
+                throw new ApiException("You do not have permission to create Live Class in this category.");
+            }
+        }
+        
+        // If the user is an admin, allow without further checks
+        if (userRoles.contains(adminRole)) {
+            // Admin has permission, so no further checks needed
+        } else if (!userRoles.contains(teacherRole)) {
+            // Restrict access if the role is neither Admin nor Teacher
+            throw new ApiException("You do not have permission to create Live Class.");
+        }
+        
         LiveStreaming live = this.modelMapper.map(liveDto, LiveStreaming.class);
         live.setTitle(liveDto.getTitle());
         live.setStartingTime(liveDto.getStartingTime());

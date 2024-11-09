@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.e_learning.entities.ForgetPassword;
 import com.e_learning.entities.OtpRequest;
 import com.e_learning.entities.User;
+import com.e_learning.exceptions.ApiException;
 import com.e_learning.payloads.ForgetPasswordDto;
 import com.e_learning.repositories.ForgetPasswordRepo;
 import com.e_learning.repositories.UserRepo;
@@ -97,7 +98,7 @@ public class ForgetPasswordServiceImpl implements ForgetPasswordService {
             return forgetPasswordRepo.save(forgetPassword);
         } else {
             logger.warn("User with the provided mobile number does not exist: {}", mobileNo);
-            throw new RuntimeException("User with the provided mobile number does not exist");
+            throw new ApiException("No Account exist with this provided mobile number");
         }
     }
     

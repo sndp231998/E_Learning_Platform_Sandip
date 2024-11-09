@@ -70,11 +70,11 @@ public class User implements UserDetails {
     @Column(name = "faculty")
     private List<String> facult;
     
-    //private LocalDateTime subscriptionValidDate;
+   
+     
+    
     private LocalDateTime date_Of_Role_Changed;
-   // private LocalDateTime lastNotificationDate;
-    
-    
+   
     private String discount;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

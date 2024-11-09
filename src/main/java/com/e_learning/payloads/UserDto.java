@@ -37,7 +37,7 @@ public class UserDto {
 
 	private String collegename;
 	private String imageName;
-	//private String faculty;
+	
 	 private List<String> facult; 
 	 @Column(name = "otp")
    private String otp;
@@ -45,21 +45,15 @@ public class UserDto {
 	 
 	    private String discount;
 
-	//private LocalDateTime SubscriptionValidDate;
+	
 	
 	private LocalDateTime date_Of_Role_Changed;
 	
-	//private LocalDateTime lastNotificationDate;
+
 	
 	private Set<RoleDto> roles = new HashSet<>();
 	
-	//---------------------------------------
-//    private String mobileNo;
-//
-//   
-//
-//    private LocalDateTime otpValidUntil;
-    //------------------------------------------
+
 	@JsonIgnore
 	public String getPassword() {
 		return this.password;

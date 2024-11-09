@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.e_learning.payloads.ApiResponse;
 
 import com.e_learning.payloads.UserDto;
+import com.e_learning.payloads.UserFacultyDto;
 import com.e_learning.services.FileService;
 import com.e_learning.services.UserService;
 import com.e_learning.services.impl.RateLimitingService;
@@ -224,7 +225,11 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-
+    @GetMapping("/teachers-and-subscribers")
+    public ResponseEntity<List<UserFacultyDto>> getTeachersAndSubscribers() {
+        List<UserFacultyDto> users = userService.getUsersWithTeacherOrSubscribedRoles();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
 }
     
 

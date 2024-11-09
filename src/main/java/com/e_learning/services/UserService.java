@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.e_learning.entities.User;
 import com.e_learning.payloads.UserDto;
+import com.e_learning.payloads.UserFacultyDto;
 
 
 
@@ -57,4 +58,6 @@ UserDto registerNewUser(UserDto user);
 	void deleteFaculty(Integer userId, String facultyName);
 
 	UserDto startTrialForNewUser(Integer userId);
+
+	List<UserFacultyDto> getUsersWithTeacherOrSubscribedRoles();
 }

@@ -35,4 +35,13 @@ public interface UserRepo extends JpaRepository<User, Integer>{
 List<User> findUsersJoinedInLast7Days(LocalDateTime sevenDaysAgo);
 
 List<User> findAllByTrialExpiryDateBefore(LocalDateTime now);
+
+//@Query("SELECT u FROM User u JOIN u.roles r WHERE r.name IN ('TEACHER_USER', 'SUBSCRIBED_USER')")
+//List<User> findByRolesTeacherOrSubscribed();
+
+//@Query("SELECT u FROM User u JOIN u.roles r WHERE LOWER(r.name) IN ('ROLE_TEACHER', 'ROLE_SUBSCRIBER')")
+@Query("SELECT u FROM User u JOIN u.roles r WHERE r.name IN ('ROLE_TEACHER', 'ROLE_SUBSCRIBED')")
+List<User> findByRolesTeacherOrSubscribed();
+
+
 }
