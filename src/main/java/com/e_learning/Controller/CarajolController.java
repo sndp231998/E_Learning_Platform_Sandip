@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.e_learning.entities.Carajol;
+import com.e_learning.exceptions.ApiException;
+import com.e_learning.payloads.ApiResponse;
 import com.e_learning.repositories.CarajolRepo;
 import com.e_learning.services.FileService;
 
@@ -72,6 +75,17 @@ public class CarajolController {
         return new ResponseEntity<>(carajols, HttpStatus.OK);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse> deleteCarajolById(@PathVariable("id") Integer id) {
+        if (!carajolRepo.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        
+        // Delete the entry from the database
+        carajolRepo.deleteById(id);
+        return new ResponseEntity<ApiResponse>(new ApiResponse("Carajol deleted Successfully", true), HttpStatus.OK);
+    }
+    
 
 
     // Method to serve files based on file type
