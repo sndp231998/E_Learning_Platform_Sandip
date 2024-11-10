@@ -498,10 +498,17 @@ user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
     public List<UserFacultyDto> getUsersWithTeacherOrSubscribedRoles() {
         List<User> users = userRepo.findByRolesTeacherOrSubscribed();
         System.out.println("Fetched Users: " + users.size());
-        users.forEach(user -> System.out.println("User ID: " + user.getId() + ", Facult: " + user.getFacult()));
 
+        // Map each user to UserFacultyDto, including roles
         return users.stream()
-                    .map(user -> new UserFacultyDto(user.getId(), user.getFacult()))
+                    .map(user -> {
+                        // Extract role names as a list of strings
+                        List<String> roleNames = user.getRoles().stream()
+                                                     .map(Role::getName)
+                                                     .collect(Collectors.toList());
+                        // Create UserFacultyDto with id, faculties, and roles
+                        return new UserFacultyDto(user.getId(), user.getFacult(), roleNames);
+                    })
                     .collect(Collectors.toList());
     }
 
