@@ -9,6 +9,7 @@ public class JwtAuthRequest {
 	private String password;
 	
 	private String mobilenum;
-
+   
+	private String browserInfo;
 
 }

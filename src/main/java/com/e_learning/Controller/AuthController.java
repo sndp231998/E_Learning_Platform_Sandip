@@ -38,6 +38,7 @@ import com.e_learning.services.UserService;
 import com.e_learning.services.impl.RateLimitingService;
 
 import java.security.Principal;
+import java.util.Optional;
 
 
 @RestController
@@ -69,30 +70,38 @@ public class AuthController {
 	 @Autowired
 	    private ForgetPasswordService forgetPasswordService;
 
-	// Inject your custom service
-//	 @Autowired
-//	 private CustomUserDetailService customUserDetailService;
-
-	 
-//	 @GetMapping("/chat")
-//	    public String showChatPage() {
-//	        return "forward:/index.html"; // This will render chat.html from the resources/statics folder
-//	    }
-	 
-	 
 	 @PostMapping("/login")
-		public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request) throws Exception {
+		public ResponseEntity<?> createToken(@RequestBody JwtAuthRequest request) throws Exception {
 			this.authenticate(request.getUsername(), request.getPassword());
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(request.getUsername());
 			//UserDetails userd=this.userDetailsService.loadUserByUsername(request.getMobilenum());
 			String token = this.jwtTokenHelper.generateToken(userDetails);
-			 rateLimitingService.checkRateLimit("test-api-key");
+			
+			 // Fetch the user based on the username
+			 Optional<User> optionalUser = this.userRepo.findByEmail(request.getUsername());
+			    User user = optionalUser.orElseThrow(() -> new Exception("User not found"));
+
+			    String providedIp = request.getBrowserInfo();
+			    if (user.getUserAgent1() == null || user.getUserAgent1().isEmpty()) {
+			        user.setUserAgent1(providedIp);
+			        userRepo.save(user); // Save the updated user information in the database
+			    }
+		    // Get the stored IP and compare it with the provided IP from the request
+		    String storedIp = user.getUserAgent1();
+		   
+		 // Check if the provided IP matches the stored IP
+		    // Check if the provided IP matches the stored IP
+		    if (!storedIp.equals(providedIp)) {
+		        return new ResponseEntity<String>("IP address mismatch. please contact to Utkrista Shikshya ", HttpStatus.UNAUTHORIZED);
+		    }
+		    rateLimitingService.checkRateLimit("test-api-key");
 			JwtAuthResponse response = new JwtAuthResponse();
 			response.setToken(token);
 			response.setUser(this.mapper.map((User) userDetails, UserDto.class));
 			return new ResponseEntity<JwtAuthResponse>(response, HttpStatus.OK);
 		}
 
+	 
 
 	
 //otp for registration
