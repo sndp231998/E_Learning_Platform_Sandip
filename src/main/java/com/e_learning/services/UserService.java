@@ -60,4 +60,12 @@ UserDto registerNewUser(UserDto user);
 	UserDto startTrialForNewUser(Integer userId);
 
 	List<UserFacultyDto> getUsersWithTeacherOrSubscribedRoles();
+	
+	List<UserFacultyDto> getUsersWithTeacherRoles();
+
+	void clearUserAgent(Integer userId);
+
+	
+	
+	 
 }

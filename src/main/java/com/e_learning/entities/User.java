@@ -64,6 +64,8 @@ public class User implements UserDetails {
 	private String imageName;
     private String collegename;
 
+    private String userAgent1;
+  
     
     @ElementCollection
     @CollectionTable(name = "user_faculty", joinColumns = @JoinColumn(name = "user_id"))
@@ -71,7 +73,7 @@ public class User implements UserDetails {
     private List<String> facult;
     
    
-     
+
     
     private LocalDateTime date_Of_Role_Changed;
    

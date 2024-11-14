@@ -56,13 +56,20 @@ public class UserController {
 	    private RateLimitingService rateLimitingService;
 
 	 
-	 
+	 @PreAuthorize("hasRole('ADMIN') or hasRole('NORMAL')")
 	 @PutMapping("/{userId}/start-trial")
 	    public ResponseEntity<UserDto> startTrialForNewUser(@PathVariable Integer userId) {
 	        UserDto updatedUser = this.userService.startTrialForNewUser(userId);
 	        return ResponseEntity.ok(updatedUser);
 	    }
 	
+	 @PreAuthorize("hasRole('ADMIN')")
+	 @PostMapping("/{userId}/clear-user-agent")
+	 public ResponseEntity<String> clearUserAgent(@PathVariable Integer userId) {
+	     userService.clearUserAgent(userId);
+	     return ResponseEntity.ok("User agent cleared successfully for user with ID: " + userId);
+	 }
+
 	 
 	// POST-create user
 	 @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
@@ -209,12 +216,13 @@ public class UserController {
         }
     }
 
-
+    @PreAuthorize("hasRole('SUBSCRIBED') or hasRole('TEACHER')")
     @GetMapping("/{userId}/faculties")
     public ResponseEntity<List<String>> getFacultiesByUserId(@PathVariable int userId) {
         List<String> faculties = userService.getFacultiesByUserId(userId);
         return ResponseEntity.ok(faculties);
     }
+    
     
     @GetMapping("/recent-7-days")
     public ResponseEntity<?> getUsersJoinedInLast7Days() {
@@ -232,6 +240,13 @@ public class UserController {
         List<UserFacultyDto> users = userService.getUsersWithTeacherOrSubscribedRoles();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+    
+    @GetMapping("/teachers")
+    public ResponseEntity<List<UserFacultyDto>> getTeachers() {
+        List<UserFacultyDto> users = userService.getUsersWithTeacherRoles();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+    
 }
     
 

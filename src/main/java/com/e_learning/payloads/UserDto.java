@@ -34,7 +34,7 @@ public class UserDto {
 	private LocalDateTime dateOfRegistration;
 
 	private String password;
-
+	 private String userAgent1;
 	private String collegename;
 	private String imageName;
 	

@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -71,6 +72,74 @@ public class UserServiceImpl implements UserService {
     private CategoryRepo categoryRepo;
     @Autowired
 private OtpRequestService sendmsg;
+    
+    
+    
+    @Override
+    public UserDto registerNewUser(UserDto userDto) {
+        User user = this.modelMapper.map(userDto, User.class);
+       user.setImageName("");
+       user.setDateOfRegistration(LocalDateTime.now());
+       user.setMobileNo(userDto.getEmail());
+       user.setUserAgent1(userDto.getUserAgent1());
+     // encoded the password
+     		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+     		// roles
+    		Role role = this.roleRepo.findById(AppConstants.NORMAL_USER).get();
+    		user.getRoles().add(role);
+        String otp = userDto.getOtp();
+        
+        // Logging OTP from user
+        logger.info("Otp from user: " + otp);
+        
+        if (otp == null) {
+            throw new IllegalArgumentException("OTP must be provided");
+        }
+
+        // Get OTP requests from the repository
+        List<OtpRequest> otpRequests = this.otpRepo.findByOtp(otp);
+        logger.info("Retrieved OTP requests: " + otpRequests);
+        
+        // Iterate through each OTP request and check validity
+        OtpRequest validOtpRequest = null;
+        for (OtpRequest otpRequest : otpRequests) {
+            // Null check before comparison
+            if (otpRequest.getOtp() != null && otpRequest.getOtp().equals(otp)) {
+                LocalDateTime otpValidUntil = otpRequest.getOtpValidUntil();
+                if (otpValidUntil != null) {
+                    Instant otpValidUntilInstant = otpValidUntil.atZone(ZoneId.systemDefault()).toInstant();
+                    Instant now = Instant.now();
+                    if (otpValidUntilInstant.isAfter(now)) {
+                        validOtpRequest = otpRequest;
+                        break; // Exit the loop if a valid OTP is found
+                    }
+                }
+            }
+        }
+        
+        if (validOtpRequest == null) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+        
+        String mobileNo = validOtpRequest.getMobileNo();
+        user.setMobileNo(mobileNo);
+        
+        User newUser = this.userRepo.save(user);
+        
+        String welcomeMessage = String.format("Welcome, %s! We're excited to have you on our eLearning platform. Dive in and enjoy the journey ahead! "
+        		+ "Thank you for choosing us, Utkrista Shikshya", user.getName());
+        sendmsg.sendMessage(user.getMobileNo(), welcomeMessage); // Assuming notificationService sends SMS
+
+     // Create in-app notification
+        notificationService.createNotification(newUser.getId(), welcomeMessage);
+        
+        return this.modelMapper.map(newUser, UserDto.class);
+    }
+    
+   
+    
+    
+    
     
     @Override
     public UserDto startTrialForNewUser(Integer userId) {
@@ -235,67 +304,7 @@ user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
         userRepo.save(user);
         System.out.println("User role changed to " + roleName + ".");
     }
-    
-    @Override
-    public UserDto registerNewUser(UserDto userDto) {
-        User user = this.modelMapper.map(userDto, User.class);
-       user.setImageName("");
-       user.setDateOfRegistration(LocalDateTime.now());
-       user.setMobileNo(userDto.getEmail());
-     // encoded the password
-     		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-     		// roles
-    		Role role = this.roleRepo.findById(AppConstants.NORMAL_USER).get();
-    		user.getRoles().add(role);
-        String otp = userDto.getOtp();
-        
-        // Logging OTP from user
-        logger.info("Otp from user: " + otp);
-        
-        if (otp == null) {
-            throw new IllegalArgumentException("OTP must be provided");
-        }
-
-        // Get OTP requests from the repository
-        List<OtpRequest> otpRequests = this.otpRepo.findByOtp(otp);
-        logger.info("Retrieved OTP requests: " + otpRequests);
-        
-        // Iterate through each OTP request and check validity
-        OtpRequest validOtpRequest = null;
-        for (OtpRequest otpRequest : otpRequests) {
-            // Null check before comparison
-            if (otpRequest.getOtp() != null && otpRequest.getOtp().equals(otp)) {
-                LocalDateTime otpValidUntil = otpRequest.getOtpValidUntil();
-                if (otpValidUntil != null) {
-                    Instant otpValidUntilInstant = otpValidUntil.atZone(ZoneId.systemDefault()).toInstant();
-                    Instant now = Instant.now();
-                    if (otpValidUntilInstant.isAfter(now)) {
-                        validOtpRequest = otpRequest;
-                        break; // Exit the loop if a valid OTP is found
-                    }
-                }
-            }
-        }
-        
-        if (validOtpRequest == null) {
-            throw new IllegalArgumentException("Invalid or expired OTP");
-        }
-        
-        String mobileNo = validOtpRequest.getMobileNo();
-        user.setMobileNo(mobileNo);
-        
-        User newUser = this.userRepo.save(user);
-        
-        String welcomeMessage = String.format("Welcome, %s! We're excited to have you on our eLearning platform. Dive in and enjoy the journey ahead! "
-        		+ "Thank you for choosing us, Utkrista Shikshya", user.getName());
-        sendmsg.sendMessage(user.getMobileNo(), welcomeMessage); // Assuming notificationService sends SMS
-
-     // Create in-app notification
-        notificationService.createNotification(newUser.getId(), welcomeMessage);
-        
-        return this.modelMapper.map(newUser, UserDto.class);
-    }
-    
+  
     
     
   
@@ -507,10 +516,40 @@ user.setTrialExpiryDate(LocalDateTime.now().plusDays(7));
                                                      .map(Role::getName)
                                                      .collect(Collectors.toList());
                         // Create UserFacultyDto with id, faculties, and roles
-                        return new UserFacultyDto(user.getId(), user.getFacult(), roleNames);
+                        return new UserFacultyDto(user.getId(),user.getName(), user.getFacult(), roleNames);
                     })
                     .collect(Collectors.toList());
     }
+    
+    @Override
+    public List<UserFacultyDto> getUsersWithTeacherRoles() {
+        List<User> users = userRepo.FindByRolesTeacher();
+        		
+        System.out.println("Fetched Users: " + users.size());
+
+        // Map each user to UserFacultyDto, including roles
+        return users.stream()
+                    .map(user -> {
+                        // Extract role names as a list of strings
+                        List<String> roleNames = user.getRoles().stream()
+                                                     .map(Role::getName)
+                                                     .collect(Collectors.toList());
+                        // Create UserFacultyDto with id, faculties, and roles
+                        return new UserFacultyDto(user.getId(),user.getName(), user.getFacult(), roleNames);
+                    })
+                    .collect(Collectors.toList());
+    }
+    
+    @Override
+    public void clearUserAgent(Integer userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
+        user.setUserAgent1(null); // Clear the userAgent1 field
+        userRepo.save(user); // Save the changes to the database
+    }
+
+
 
     }
 

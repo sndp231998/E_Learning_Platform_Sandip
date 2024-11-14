@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.e_learning.entities.Role;
 import com.e_learning.entities.User;
 
 import io.lettuce.core.dynamic.annotation.Param;
@@ -36,12 +37,11 @@ List<User> findUsersJoinedInLast7Days(LocalDateTime sevenDaysAgo);
 
 List<User> findAllByTrialExpiryDateBefore(LocalDateTime now);
 
-//@Query("SELECT u FROM User u JOIN u.roles r WHERE r.name IN ('TEACHER_USER', 'SUBSCRIBED_USER')")
-//List<User> findByRolesTeacherOrSubscribed();
 
-//@Query("SELECT u FROM User u JOIN u.roles r WHERE LOWER(r.name) IN ('ROLE_TEACHER', 'ROLE_SUBSCRIBER')")
+
 @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name IN ('ROLE_TEACHER', 'ROLE_SUBSCRIBED')")
 List<User> findByRolesTeacherOrSubscribed();
 
-
+@Query("SELECT u FROM User u JOIN u.roles r WHERE r.name IN ('ROLE_TEACHER')")
+List<User>FindByRolesTeacher();
 }
